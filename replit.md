@@ -1,44 +1,67 @@
-# [Project name]
+# Hotel Management System
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A full-stack hotel/restaurant management web app with role-based dashboards, real-time order updates via Socket.IO, and JWT authentication.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server (port 8080)
+- `pnpm --filter @workspace/hotel-management run dev` — run the frontend (port 18356)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
+- Optional env: `JWT_SECRET` — JWT signing secret (defaults to dev key)
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
+- Frontend: React + Vite + Wouter + TanStack Query + Socket.IO client
+- API: Express 5 + Socket.IO
 - DB: PostgreSQL + Drizzle ORM
+- Auth: JWT (custom, role-based)
 - Validation: Zod (`zod/v4`), `drizzle-zod`
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `lib/api-spec/openapi.yaml` — OpenAPI contract (source of truth)
+- `lib/db/src/schema/` — Drizzle table definitions (users, tables, menu-items, orders, order-items, payments, inventory, expenses)
+- `artifacts/api-server/src/routes/` — Express route handlers
+- `artifacts/api-server/src/middlewares/auth.ts` — JWT middleware
+- `artifacts/api-server/src/lib/socket.ts` — Socket.IO server
+- `artifacts/hotel-management/src/` — React frontend
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- JWT stored in localStorage as `hms_token`; sent as Bearer token on every request
+- Socket.IO used for real-time order updates between waiter and kitchen dashboards
+- PostgreSQL instead of MongoDB (Replit built-in, supports rollback)
+- Orval codegen for type-safe API hooks from OpenAPI spec
+- Role-based routing: waiter → /waiter, kitchen → /kitchen, accountant → /accountant, owner → /owner
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Four role-based dashboards:
+- **Waiter**: Table grid, create orders, track live status
+- **Kitchen**: Incoming order tickets, real-time updates, status management
+- **Accountant**: Bill generation, GST calculation, payment processing, daily reports
+- **Owner**: Revenue analytics, monthly charts, top-selling items, staff performance, inventory alerts, menu & inventory management
 
-## User preferences
+## Demo Credentials
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- owner@hotel.com / password123
+- waiter@hotel.com / password123
+- kitchen@hotel.com / password123
+- accountant@hotel.com / password123
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- After changing openapi.yaml, always run codegen: `pnpm --filter @workspace/api-spec run codegen`
+- After codegen, fix `lib/api-zod/src/index.ts` to only export from `./generated/api` (orval overwrites it)
+- Socket.IO connects to same origin (no separate WS URL needed in production)
+- Run `pnpm --filter @workspace/db run push` after schema changes
 
 ## Pointers
 

@@ -1,0 +1,160 @@
+Build a full-stack hotel/restaurant management web app with role-based dashboards using React for frontend, Node.js + Express.js for backend, MongoDB for database, and Socket.IO for real-time updates.
+
+App name: Hotel Management System
+
+Main requirements:
+
+1. Authentication System
+
+* Role-based login system
+* Roles: Waiter, Kitchen Staff, Accountant, Owner
+* Secure authentication with JWT
+* Each role should access only its dashboard
+
+2. Waiter Dashboard
+   Features:
+
+* Show all tables in grid view
+* Table statuses:
+
+  * Available
+  * Occupied
+  * Cooking
+  * Ready
+  * Billing
+* Create new order
+* Select table
+* Add menu items
+* Increase/decrease quantity
+* Add special notes
+* Send order to kitchen
+* View live order status
+* Request bill
+* Order history
+
+UI requirements:
+
+* Clean modern UI
+* Responsive design
+* Color-coded table cards
+* Fast order input
+* Search menu items
+* Category filter
+
+3. Kitchen Dashboard
+   Features:
+
+* Receive live incoming orders from waiter dashboard
+* Show table number
+* Show ordered items
+* Show notes
+* Order timer
+* Update status:
+
+  * Pending
+  * Preparing
+  * Ready
+* Real-time sync with waiter dashboard
+
+4. Accountant Dashboard
+   Features:
+
+* View completed orders
+* Generate bill
+* Auto-calculate subtotal
+* GST/tax calculation
+* Apply discount
+* Select payment method:
+
+  * Cash
+  * UPI
+  * Card
+* Mark payment completed
+* Print invoice
+* Daily sales report
+
+5. Owner Dashboard
+   Features:
+
+* Total revenue today
+* Total orders today
+* Monthly sales chart
+* Top-selling items
+* Staff performance
+* Expense report
+* Profit analytics
+* Customer count
+* Table occupancy analytics
+
+6. Menu Management (Owner only)
+   Features:
+
+* Add menu item
+* Edit menu item
+* Delete menu item
+* Category management
+* Price management
+* Availability toggle
+
+7. Inventory Management (Owner only)
+   Features:
+
+* Add stock
+* Update stock
+* Low stock alerts
+* Inventory reports
+
+Database models:
+Users
+Tables
+Orders
+OrderItems
+MenuItems
+Payments
+Inventory
+Expenses
+
+Technical requirements:
+
+* Use React Router for routing
+* Use Context API or Redux for state management
+* Use Socket.IO for live updates
+* Use REST API architecture
+* Use responsive mobile-first design
+* Use modern component-based architecture
+* Use reusable UI components
+* Add loading states
+* Add error handling
+* Add notifications/toasts
+
+Design requirements:
+
+* Professional restaurant theme
+* Minimal clean UI
+* Dashboard cards
+* Charts for owner analytics
+* Sidebar navigation
+* Top navbar
+* Mobile responsive
+* Fast performance
+
+Folder structure:
+frontend/
+backend/
+
+Backend:
+
+* controllers
+* routes
+* models
+* middleware
+
+Frontend:
+
+* components
+* pages
+* dashboard
+* services
+* hooks
+
+Generate complete working code for frontend and backend with proper folder structure, API routes, database schemas, authentication middleware, dashboard pages, reusable components, and responsive UI.
