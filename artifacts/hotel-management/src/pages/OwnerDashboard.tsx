@@ -1,7 +1,7 @@
 import { useGetOwnerDashboard, useGetTopSellingItems, useGetStaffPerformance, useGetMonthlyChart } from "@workspace/api-client-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
-import { TrendingUp, Users, ShoppingBag, Table2, AlertTriangle, DollarSign } from "lucide-react";
+import { TrendingUp, Users, ShoppingBag, Table2, AlertTriangle, IndianRupee } from "lucide-react";
 
 export default function OwnerDashboard() {
   const { data: stats } = useGetOwnerDashboard();
@@ -17,7 +17,7 @@ export default function OwnerDashboard() {
           <>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: "Today's Revenue", value: `₹${stats.todayRevenue.toFixed(2)}`, sub: `${stats.todayOrders} orders`, icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
+                { label: "Today's Revenue", value: `₹${stats.todayRevenue.toFixed(2)}`, sub: `${stats.todayOrders} orders`, icon: IndianRupee, color: "text-emerald-600", bg: "bg-emerald-50" },
                 { label: "Monthly Revenue", value: `₹${stats.monthRevenue.toFixed(2)}`, sub: `${stats.monthOrders} orders`, icon: TrendingUp, color: "text-blue-600", bg: "bg-blue-50" },
                 { label: "Table Occupancy", value: `${stats.tableOccupancyRate}%`, sub: "current", icon: Table2, color: "text-violet-600", bg: "bg-violet-50" },
                 { label: "Net Profit (Month)", value: `₹${stats.netProfitThisMonth.toFixed(2)}`, sub: `₹${stats.totalExpensesThisMonth.toFixed(2)} expenses`, icon: TrendingUp, color: "text-amber-600", bg: "bg-amber-50" },
