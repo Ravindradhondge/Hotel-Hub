@@ -35,7 +35,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex bg-background">
       <div className="hidden lg:flex lg:w-1/2 bg-primary flex-col justify-between p-12">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-primary-foreground">Hotel Sahgun</h1>
+          <h1 className="text-4xl font-serif font-bold text-primary-foreground">Shagun Tadka</h1>
           <p className="text-primary-foreground/70 mt-2 text-lg">Hotel Management System</p>
         </div>
         <div className="space-y-6">
@@ -55,7 +55,7 @@ export default function LoginPage() {
           ))}
         </div>
         <div className="text-primary-foreground/40 text-sm">
-          &copy; {new Date().getFullYear()} Hotel Sahgun
+          &copy; {new Date().getFullYear()} Shagun Tadka
         </div>
       </div>
 

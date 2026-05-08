@@ -38,7 +38,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
       <aside className="w-full md:w-64 bg-card border-r border-border shrink-0 md:h-screen sticky top-0 flex flex-col">
         <div className="p-6 border-b border-border flex items-center justify-between md:block">
           <div>
-            <h1 className="text-xl font-serif font-bold text-primary">Hotel Sahgun</h1>
+            <h1 className="text-xl font-serif font-bold text-primary">Shagun Tadka</h1>
             <p className="text-sm text-muted-foreground mt-1 capitalize">{user?.role} Portal</p>
           </div>
         </div>
