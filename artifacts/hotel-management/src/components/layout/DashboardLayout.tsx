@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "wouter";
-import { LogOut, LayoutDashboard, Utensils, Users, Package, FileText, ChefHat } from "lucide-react";
+import { LogOut, LayoutDashboard, Utensils, Users, Package, FileText, ChefHat, Table2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DashboardLayoutProps {
@@ -18,6 +18,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
       { name: "Overview",   href: "/owner",           icon: LayoutDashboard },
       { name: "Menu",       href: "/owner/menu",       icon: Utensils },
       { name: "Inventory",  href: "/owner/inventory",  icon: Package },
+      { name: "Tables",     href: "/owner/tables",     icon: Table2 },
       { name: "Staff",      href: "/owner/staff",      icon: Users },
     ],
     waiter:     [{ name: "Tables",  href: "/waiter",     icon: LayoutDashboard }],
