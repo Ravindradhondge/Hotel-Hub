@@ -8,29 +8,27 @@ import {
 } from "@workspace/api-client-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { io } from "socket.io-client";
-import { Plus, Minus, Search, X, Clock } from "lucide-react";
+import { Plus, Minus, Search, Clock, ShoppingBag, Flame, CheckCircle2, Receipt, UtensilsCrossed, ChevronRight } from "lucide-react";
 
-const STATUS_COLORS: Record<string, string> = {
-  available: "bg-emerald-50 border-emerald-200 text-emerald-800",
-  occupied: "bg-blue-50 border-blue-200 text-blue-800",
-  cooking: "bg-amber-50 border-amber-200 text-amber-800",
-  ready: "bg-violet-50 border-violet-200 text-violet-800",
-  billing: "bg-rose-50 border-rose-200 text-rose-800",
+const TABLE_STATUS_STYLE: Record<string, { card: string; dot: string; label: string }> = {
+  available: { card: "bg-emerald-50 border-emerald-300 hover:border-emerald-400", dot: "bg-emerald-500", label: "text-emerald-700" },
+  occupied:  { card: "bg-sky-50 border-sky-300 hover:border-sky-400",             dot: "bg-sky-500",     label: "text-sky-700" },
+  cooking:   { card: "bg-amber-50 border-amber-300 hover:border-amber-400",        dot: "bg-amber-500",   label: "text-amber-700" },
+  ready:     { card: "bg-violet-50 border-violet-300 hover:border-violet-400",     dot: "bg-violet-500",  label: "text-violet-700" },
+  billing:   { card: "bg-rose-50 border-rose-300 hover:border-rose-400",           dot: "bg-rose-500",    label: "text-rose-700" },
 };
 
-const STATUS_DOTS: Record<string, string> = {
-  available: "bg-emerald-500",
-  occupied: "bg-blue-500",
-  cooking: "bg-amber-500",
-  ready: "bg-violet-500",
-  billing: "bg-rose-500",
+const TABLE_STATUS_ICON: Record<string, JSX.Element> = {
+  available:  <UtensilsCrossed className="w-4 h-4 opacity-40" />,
+  occupied:   <Clock className="w-4 h-4 opacity-60" />,
+  cooking:    <Flame className="w-4 h-4 opacity-70" />,
+  ready:      <CheckCircle2 className="w-4 h-4 opacity-80" />,
+  billing:    <Receipt className="w-4 h-4 opacity-80" />,
 };
 
 interface CartItem { menuItemId: number; name: string; price: number; quantity: number; notes: string; }
@@ -54,6 +52,7 @@ export default function WaiterDashboard() {
   const [menuCategory, setMenuCategory] = useState("all");
   const [orderNotes, setOrderNotes] = useState("");
   const [viewOrderTable, setViewOrderTable] = useState<Table | null>(null);
+  const [activeTab, setActiveTab] = useState<"menu" | "cart">("menu");
 
   useEffect(() => {
     const socket = io();
@@ -92,6 +91,7 @@ export default function WaiterDashboard() {
   };
 
   const cartTotal = cart.reduce((sum, c) => sum + c.price * c.quantity, 0);
+  const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0);
 
   const handleOpenOrder = (table: Table) => {
     setSelectedTable(table);
@@ -99,6 +99,7 @@ export default function WaiterDashboard() {
     setOrderNotes("");
     setMenuSearch("");
     setMenuCategory("all");
+    setActiveTab("menu");
     setOrderDialogOpen(true);
   };
 
@@ -108,7 +109,7 @@ export default function WaiterDashboard() {
       { data: { tableId: selectedTable.id, items: cart.map((c) => ({ menuItemId: c.menuItemId, quantity: c.quantity, notes: c.notes || undefined })), notes: orderNotes || undefined } },
       {
         onSuccess: () => {
-          toast({ title: "Order sent to kitchen" });
+          toast({ title: "Order sent to kitchen!" });
           setOrderDialogOpen(false);
           queryClient.invalidateQueries({ queryKey: getListTablesQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetTablesSummaryQueryKey() });
@@ -131,56 +132,74 @@ export default function WaiterDashboard() {
     );
   };
 
-  const getTableOrder = (tableId: number) => allOrders.find((o) => o.tableId === tableId && ["pending", "preparing", "ready", "billing"].includes(o.status));
+  const getTableOrder = (tableId: number) =>
+    allOrders.find((o) => o.tableId === tableId && ["pending", "preparing", "ready", "billing"].includes(o.status));
 
   return (
     <DashboardLayout title="Table Management">
-      <div className="space-y-6">
+      <div className="space-y-5">
+
+        {/* ── Summary bar ── */}
         {summary && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {[
-              { label: "Available", count: summary.available, color: "text-emerald-600" },
-              { label: "Occupied", count: summary.occupied, color: "text-blue-600" },
-              { label: "Cooking", count: summary.cooking, color: "text-amber-600" },
-              { label: "Ready", count: summary.ready, color: "text-violet-600" },
-              { label: "Billing", count: summary.billing, color: "text-rose-600" },
-              { label: "Total", count: summary.total, color: "text-foreground" },
+              { label: "Available", count: summary.available, dot: "bg-emerald-500" },
+              { label: "Occupied",  count: summary.occupied,  dot: "bg-sky-500" },
+              { label: "Cooking",   count: summary.cooking,   dot: "bg-amber-500" },
+              { label: "Ready",     count: summary.ready,     dot: "bg-violet-500" },
+              { label: "Billing",   count: summary.billing,   dot: "bg-rose-500" },
+              { label: "Total",     count: summary.total,     dot: "bg-slate-400" },
             ].map((s) => (
-              <div key={s.label} className="bg-card border border-border rounded-lg p-3 text-center">
-                <div className={`text-2xl font-bold ${s.color}`}>{s.count}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
+              <div key={s.label} className="bg-card border border-border rounded-xl p-3 text-center flex flex-col items-center gap-1">
+                <div className={`w-2 h-2 rounded-full ${s.dot}`} />
+                <div className="text-xl font-bold leading-none">{s.count}</div>
+                <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{s.label}</div>
               </div>
             ))}
           </div>
         )}
 
+        {/* ── Table grid ── */}
         {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading tables...</div>
+          <div className="text-center py-12 text-muted-foreground">Loading tables…</div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {tables.map((table) => {
               const order = getTableOrder(table.id);
+              const style = TABLE_STATUS_STYLE[table.status] ?? TABLE_STATUS_STYLE.available;
               return (
                 <div
                   key={table.id}
                   data-testid={`card-table-${table.id}`}
-                  className={`relative border-2 rounded-xl p-4 cursor-pointer transition-all hover:shadow-md ${STATUS_COLORS[table.status]}`}
+                  className={`relative border-2 rounded-2xl p-4 cursor-pointer transition-all active:scale-95 select-none ${style.card}`}
                   onClick={() => table.status === "available" ? handleOpenOrder(table) : setViewOrderTable(table)}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="text-2xl font-bold">T{table.number}</div>
-                    <div className={`w-2.5 h-2.5 rounded-full mt-1 ${STATUS_DOTS[table.status]}`} />
+                  <div className="flex items-start justify-between mb-2">
+                    <span className="text-2xl font-extrabold tracking-tight">T{table.number}</span>
+                    <span className={`flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide ${style.label}`}>
+                      {TABLE_STATUS_ICON[table.status]}
+                    </span>
                   </div>
-                  <div className="text-xs space-y-1">
-                    <div className="font-medium capitalize">{table.status}</div>
-                    <div className="opacity-70">{table.capacity} seats</div>
-                    {order && <div className="opacity-70">{order.items.length} items</div>}
+                  <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide mb-2 ${style.label} bg-white/60`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+                    {table.status}
+                  </div>
+                  <div className="text-xs text-muted-foreground space-y-0.5">
+                    <div>{table.capacity} seats</div>
+                    {order && <div className="font-medium">{order.items.length} item{order.items.length !== 1 ? "s" : ""}</div>}
                   </div>
                   {table.status === "available" && (
-                    <div className="mt-3 text-xs font-medium opacity-60">Tap to create order</div>
+                    <div className="mt-2 flex items-center gap-1 text-[10px] font-medium text-emerald-600">
+                      <Plus className="w-3 h-3" /> New order
+                    </div>
                   )}
                   {table.status === "ready" && (
-                    <div className="mt-2 text-xs font-semibold animate-pulse">Food ready!</div>
+                    <div className="mt-2 text-[10px] font-bold text-violet-600 animate-pulse">🍽 Food ready!</div>
+                  )}
+                  {table.status !== "available" && (
+                    <div className="mt-2 flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                      View <ChevronRight className="w-3 h-3" />
+                    </div>
                   )}
                 </div>
               );
@@ -189,123 +208,235 @@ export default function WaiterDashboard() {
         )}
       </div>
 
+      {/* ── Order creation dialog ── */}
       <Dialog open={orderDialogOpen} onOpenChange={setOrderDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0">
-          <DialogHeader className="p-6 pb-0">
-            <DialogTitle>New Order — Table {selectedTable?.number}</DialogTitle>
+        <DialogContent className="max-w-4xl w-full h-[92vh] sm:h-[88vh] flex flex-col p-0 gap-0 overflow-hidden rounded-2xl">
+
+          {/* Header */}
+          <DialogHeader className="px-5 pt-5 pb-3 border-b border-border shrink-0">
+            <DialogTitle className="text-base font-bold flex items-center gap-2">
+              <UtensilsCrossed className="w-4 h-4 text-primary" />
+              New Order — Table {selectedTable?.number}
+            </DialogTitle>
+            {/* Mobile tabs */}
+            <div className="flex sm:hidden gap-1 mt-3">
+              <button
+                onClick={() => setActiveTab("menu")}
+                className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${activeTab === "menu" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}
+              >
+                Menu
+              </button>
+              <button
+                onClick={() => setActiveTab("cart")}
+                className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors relative ${activeTab === "cart" ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}
+              >
+                Cart
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            </div>
           </DialogHeader>
-          <div className="flex flex-1 min-h-0 gap-0 overflow-hidden">
-            <div className="flex-1 flex flex-col border-r border-border overflow-hidden">
-              <div className="p-4 space-y-3 border-b border-border">
+
+          {/* Body */}
+          <div className="flex flex-1 min-h-0 overflow-hidden">
+
+            {/* ── Menu panel (always visible on desktop, tab-controlled on mobile) ── */}
+            <div className={`flex flex-col flex-1 min-w-0 overflow-hidden ${activeTab === "cart" ? "hidden sm:flex" : "flex"}`}>
+              {/* Search + category */}
+              <div className="px-4 pt-3 pb-2 space-y-2 shrink-0 border-b border-border bg-card/50">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input className="pl-9" placeholder="Search menu..." value={menuSearch} onChange={(e) => setMenuSearch(e.target.value)} data-testid="input-menu-search" />
+                  <Input className="pl-9 h-9 text-sm" placeholder="Search dishes…" value={menuSearch} onChange={(e) => setMenuSearch(e.target.value)} data-testid="input-menu-search" />
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  <button onClick={() => setMenuCategory("all")} className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${menuCategory === "all" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}>All</button>
-                  {categories.map((cat) => (
-                    <button key={cat} onClick={() => setMenuCategory(cat)} className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${menuCategory === cat ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}>{cat}</button>
+                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {["all", ...categories].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setMenuCategory(cat)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors shrink-0 ${menuCategory === cat ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted text-muted-foreground hover:bg-secondary"}`}
+                    >
+                      {cat === "all" ? "All" : cat}
+                    </button>
                   ))}
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-4">
+
+              {/* Menu items */}
+              <div className="flex-1 overflow-y-auto p-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {filteredMenu.length === 0 && (
+                    <p className="col-span-2 text-center text-sm text-muted-foreground py-10">No items found</p>
+                  )}
                   {filteredMenu.map((item) => {
                     const inCart = cart.find((c) => c.menuItemId === item.id);
                     return (
-                      <div key={item.id} data-testid={`card-menu-${item.id}`} className="flex items-center justify-between p-3 bg-secondary/30 hover:bg-secondary/60 rounded-lg transition-colors">
+                      <div
+                        key={item.id}
+                        data-testid={`card-menu-${item.id}`}
+                        className="flex items-center gap-3 p-3 bg-card border border-border rounded-xl hover:border-primary/40 hover:shadow-sm transition-all"
+                      >
+                        {/* Veg/Non-veg indicator dot */}
+                        <div className="shrink-0 w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                          {item.name.charAt(0).toUpperCase()}
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm truncate">{item.name}</div>
-                          <div className="text-xs text-muted-foreground">{item.category}</div>
-                          <div className="text-sm font-semibold text-primary mt-0.5">₹{item.price}</div>
+                          <div className="font-semibold text-sm leading-tight truncate">{item.name}</div>
+                          <div className="text-[10px] text-muted-foreground uppercase tracking-wide mt-0.5">{item.category}</div>
+                          <div className="text-sm font-bold text-primary mt-0.5">₹{item.price}</div>
                         </div>
                         {inCart ? (
-                          <div className="flex items-center gap-2 ml-2">
-                            <button onClick={() => removeFromCart(item.id)} className="w-7 h-7 rounded-full bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"><Minus className="w-3.5 h-3.5" /></button>
-                            <span className="w-5 text-center font-bold text-sm">{inCart.quantity}</span>
-                            <button onClick={() => addToCart(item)} className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"><Plus className="w-3.5 h-3.5" /></button>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              onClick={() => removeFromCart(item.id)}
+                              className="w-7 h-7 rounded-full border-2 border-primary/30 bg-primary/5 hover:bg-primary/15 flex items-center justify-center transition-colors"
+                            >
+                              <Minus className="w-3 h-3 text-primary" />
+                            </button>
+                            <span className="w-6 text-center font-bold text-sm text-primary">{inCart.quantity}</span>
+                            <button
+                              onClick={() => addToCart(item)}
+                              className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
                           </div>
                         ) : (
-                          <button onClick={() => addToCart(item)} data-testid={`button-add-${item.id}`} className="ml-2 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"><Plus className="w-4 h-4" /></button>
+                          <button
+                            onClick={() => addToCart(item)}
+                            data-testid={`button-add-${item.id}`}
+                            className="shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 active:scale-95 transition-all"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
                         )}
                       </div>
                     );
                   })}
                 </div>
               </div>
+
+              {/* Mobile: floating cart button at bottom of menu tab */}
+              {cartCount > 0 && activeTab === "menu" && (
+                <div className="sm:hidden px-4 py-3 border-t border-border bg-card shrink-0">
+                  <button
+                    onClick={() => setActiveTab("cart")}
+                    className="w-full flex items-center justify-between bg-primary text-primary-foreground px-4 py-3 rounded-xl font-semibold text-sm active:scale-95 transition-all"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>{cartCount} item{cartCount !== 1 ? "s" : ""} added</span>
+                    </div>
+                    <span>₹{cartTotal.toFixed(0)} →</span>
+                  </button>
+                </div>
+              )}
             </div>
 
-            <div className="w-72 flex flex-col overflow-hidden">
-              <div className="p-4 border-b border-border font-medium text-sm">Order Summary ({cart.length} items)</div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+            {/* ── Cart panel ── */}
+            <div className={`flex flex-col sm:w-72 w-full shrink-0 border-l border-border overflow-hidden ${activeTab === "menu" ? "hidden sm:flex" : "flex"}`}>
+              <div className="px-4 py-3 border-b border-border shrink-0 flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4 text-muted-foreground" />
+                <span className="font-semibold text-sm">Order ({cartCount} items)</span>
+              </div>
+              <div className="flex-1 overflow-y-auto p-3 space-y-2">
                 {cart.length === 0 ? (
-                  <p className="text-sm text-muted-foreground text-center py-8">Add items from the menu</p>
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
+                    <ShoppingBag className="w-8 h-8 opacity-30" />
+                    <p className="text-sm">Your cart is empty</p>
+                    <p className="text-xs">Add items from the menu</p>
+                  </div>
                 ) : (
                   cart.map((item) => (
-                    <div key={item.menuItemId} className="flex items-start gap-2">
+                    <div key={item.menuItemId} className="flex items-center gap-2 p-2.5 bg-secondary/40 rounded-xl">
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{item.name}</div>
-                        <div className="text-xs text-muted-foreground">₹{item.price} × {item.quantity} = ₹{item.price * item.quantity}</div>
+                        <div className="text-sm font-semibold truncate">{item.name}</div>
+                        <div className="text-xs text-muted-foreground">₹{item.price} × {item.quantity} = <span className="font-semibold text-foreground">₹{item.price * item.quantity}</span></div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => removeFromCart(item.menuItemId)} className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-secondary"><Minus className="w-3 h-3" /></button>
-                        <span className="w-4 text-center text-sm">{item.quantity}</span>
-                        <button onClick={() => setCart((p) => p.map((c) => c.menuItemId === item.menuItemId ? { ...c, quantity: c.quantity + 1 } : c))} className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-secondary"><Plus className="w-3 h-3" /></button>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button onClick={() => removeFromCart(item.menuItemId)} className="w-6 h-6 rounded-full border border-border bg-background flex items-center justify-center hover:bg-destructive/10 transition-colors"><Minus className="w-3 h-3" /></button>
+                        <span className="w-5 text-center text-sm font-bold">{item.quantity}</span>
+                        <button onClick={() => setCart((p) => p.map((c) => c.menuItemId === item.menuItemId ? { ...c, quantity: c.quantity + 1 } : c))} className="w-6 h-6 rounded-full border border-border bg-background flex items-center justify-center hover:bg-primary/10 transition-colors"><Plus className="w-3 h-3" /></button>
                       </div>
                     </div>
                   ))
                 )}
               </div>
-              <div className="p-4 border-t border-border space-y-3">
-                <Textarea placeholder="Order notes (optional)..." value={orderNotes} onChange={(e) => setOrderNotes(e.target.value)} className="text-sm resize-none h-20" />
-                <div className="flex justify-between font-semibold"><span>Total</span><span>₹{cartTotal.toFixed(2)}</span></div>
+              <div className="p-4 border-t border-border space-y-3 shrink-0 bg-card/50">
+                <Textarea
+                  placeholder="Special instructions…"
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                  className="text-sm resize-none h-16 rounded-xl"
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Total</span>
+                  <span className="text-lg font-bold text-primary">₹{cartTotal.toFixed(0)}</span>
+                </div>
+                <Button
+                  onClick={handleSendOrder}
+                  disabled={cart.length === 0 || createOrder.isPending}
+                  className="w-full rounded-xl h-11 font-semibold"
+                  data-testid="button-send-order"
+                >
+                  {createOrder.isPending ? "Sending…" : "🍳 Send to Kitchen"}
+                </Button>
+                <Button variant="outline" className="w-full rounded-xl" onClick={() => setOrderDialogOpen(false)}>Cancel</Button>
               </div>
             </div>
           </div>
-          <DialogFooter className="p-4 border-t border-border">
-            <Button variant="outline" onClick={() => setOrderDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleSendOrder} disabled={cart.length === 0 || createOrder.isPending} data-testid="button-send-order">
-              {createOrder.isPending ? "Sending..." : "Send to Kitchen"}
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* ── View existing order dialog ── */}
       <Dialog open={!!viewOrderTable} onOpenChange={() => setViewOrderTable(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-sm rounded-2xl">
           {viewOrderTable && (() => {
             const order = getTableOrder(viewOrderTable.id);
+            const style = TABLE_STATUS_STYLE[viewOrderTable.status] ?? TABLE_STATUS_STYLE.available;
             return (
               <>
                 <DialogHeader>
-                  <DialogTitle>Table {viewOrderTable.number} — {viewOrderTable.status}</DialogTitle>
+                  <DialogTitle className="flex items-center gap-2">
+                    Table {viewOrderTable.number}
+                    <span className={`ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${style.label} bg-white border border-current/20`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+                      {viewOrderTable.status}
+                    </span>
+                  </DialogTitle>
                 </DialogHeader>
                 {order ? (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
+                  <div className="space-y-4 mt-1">
+                    <div className="bg-secondary/40 rounded-xl p-3 space-y-2">
                       {order.items.map((item) => (
                         <div key={item.id} className="flex justify-between text-sm">
-                          <span>{item.quantity}x {item.menuItemName}</span>
-                          <span>₹{item.subtotal.toFixed(2)}</span>
+                          <span className="text-muted-foreground">{item.quantity}× {item.menuItemName}</span>
+                          <span className="font-semibold">₹{item.subtotal.toFixed(0)}</span>
                         </div>
                       ))}
-                      <div className="border-t border-border pt-2 flex justify-between font-semibold">
-                        <span>Total</span><span>₹{order.totalAmount.toFixed(2)}</span>
+                      <div className="border-t border-border pt-2 flex justify-between font-bold">
+                        <span>Total</span><span className="text-primary">₹{order.totalAmount.toFixed(0)}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">Status: <span className="font-medium capitalize text-foreground">{order.status}</span></span>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4" />
+                      Status: <span className={`font-semibold capitalize ${style.label}`}>{order.status}</span>
                     </div>
                     {order.status === "ready" && (
-                      <Button className="w-full" onClick={() => { handleRequestBill(order); setViewOrderTable(null); }} data-testid="button-request-bill">Request Bill</Button>
+                      <Button className="w-full rounded-xl h-11 font-semibold" onClick={() => { handleRequestBill(order); setViewOrderTable(null); }} data-testid="button-request-bill">
+                        <Receipt className="w-4 h-4 mr-2" /> Request Bill
+                      </Button>
                     )}
                     {order.status === "billing" && (
-                      <div className="text-center text-sm text-muted-foreground">Bill requested — waiting for payment</div>
+                      <div className="text-center text-sm text-muted-foreground bg-secondary/40 rounded-xl py-3">
+                        Bill requested — awaiting payment
+                      </div>
                     )}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground text-sm">No active order</p>
+                  <p className="text-muted-foreground text-sm mt-2">No active order for this table.</p>
                 )}
               </>
             );
