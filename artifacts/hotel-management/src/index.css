@@ -47,72 +47,73 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
 }
 
 :root {
-  --background: 0 0% 98%;
-  --foreground: 346 20% 10%;
-  --border: 346 10% 85%;
-  --input: 346 10% 85%;
-  --ring: 346 41% 32%;
+  --background: 30 20% 97%;
+  --foreground: 346 25% 10%;
+  --border: 346 10% 88%;
+  --input: 346 10% 88%;
+  --ring: 346 45% 35%;
 
   --card: 0 0% 100%;
-  --card-foreground: 346 20% 10%;
-  --card-border: 346 10% 90%;
+  --card-foreground: 346 25% 10%;
+  --card-border: 346 10% 92%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 346 20% 10%;
+  --popover-foreground: 346 25% 10%;
   --popover-border: 346 10% 90%;
 
-  --primary: 346 41% 32%;
+  --primary: 346 45% 34%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 346 20% 92%;
-  --secondary-foreground: 346 41% 32%;
+  --secondary: 346 20% 94%;
+  --secondary-foreground: 346 45% 34%;
 
-  --muted: 346 10% 92%;
-  --muted-foreground: 346 10% 40%;
+  --muted: 346 10% 94%;
+  --muted-foreground: 346 10% 45%;
 
-  --accent: 38 40% 90%;
-  --accent-foreground: 38 60% 30%;
+  --accent: 38 45% 91%;
+  --accent-foreground: 38 65% 28%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --radius: 0.5rem;
+  --radius: 0.625rem;
   --app-font-sans: 'Inter', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
 }
 
 .dark {
-  --background: 346 20% 5%;
-  --foreground: 0 0% 98%;
-  --border: 346 20% 15%;
-  --input: 346 20% 15%;
-  --ring: 346 41% 40%;
+  --background: 346 20% 6%;
+  --foreground: 0 0% 97%;
+  --border: 346 20% 16%;
+  --input: 346 20% 16%;
+  --ring: 346 45% 45%;
 
-  --card: 346 20% 8%;
-  --card-foreground: 0 0% 98%;
-  --card-border: 346 20% 12%;
+  --card: 346 20% 9%;
+  --card-foreground: 0 0% 97%;
+  --card-border: 346 20% 14%;
 
-  --popover: 346 20% 8%;
-  --popover-foreground: 0 0% 98%;
-  --popover-border: 346 20% 12%;
+  --popover: 346 20% 9%;
+  --popover-foreground: 0 0% 97%;
+  --popover-border: 346 20% 14%;
 
-  --primary: 346 41% 40%;
+  --primary: 346 45% 48%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 346 20% 15%;
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 346 20% 16%;
+  --secondary-foreground: 0 0% 97%;
 
-  --muted: 346 20% 15%;
-  --muted-foreground: 346 10% 60%;
+  --muted: 346 20% 16%;
+  --muted-foreground: 346 10% 62%;
 
-  --accent: 38 40% 20%;
-  --accent-foreground: 38 60% 80%;
+  --accent: 38 40% 22%;
+  --accent-foreground: 38 60% 82%;
 
-  --destructive: 0 62% 40%;
+  --destructive: 0 62% 42%;
   --destructive-foreground: 0 0% 100%;
 }
 
@@ -122,5 +123,21 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .card-shadow {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  }
+  .card-shadow-md {
+    box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
   }
 }

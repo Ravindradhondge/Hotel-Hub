@@ -1,0 +1,151 @@
+Redesign the entire UI of my Hotel Management System web app with a modern, premium, fast restaurant-style dashboard UI.
+
+Tech stack:
+Frontend: React + Tailwind CSS
+
+UI goal:
+Make the app look professional like a premium SaaS dashboard, modern, clean, minimal, responsive, and optimized for fast operational use in restaurants.
+
+Design system:
+
+* Modern card-based UI
+* Smooth hover animations
+* Rounded corners (xl/2xl)
+* Soft shadows
+* Clean typography
+* Minimal spacing
+* Mobile responsive
+* Dark/light mode support
+* Fast loading skeletons
+* Toast notifications
+* Sticky top navbar
+* Sidebar navigation
+* Clean dashboard widgets
+
+Theme:
+Use a restaurant/business dashboard aesthetic:
+
+* Warm professional colors
+* Clean white backgrounds
+* Elegant dark mode
+* Status colors:
+  Green = Available
+  Red = Occupied
+  Yellow = Preparing
+  Blue = Ready
+  Purple = Billing
+
+Redesign these screens:
+
+1. Login Page
+
+* Full modern login UI
+* Role selector cards (Waiter, Kitchen, Accountant, Owner)
+* Beautiful centered login box
+* Brand logo section
+* PIN-based quick login option
+
+2. Waiter Dashboard
+   Redesign with:
+
+* Table cards in responsive grid
+* Status color indicators
+* Quick action buttons
+* Search table
+* Add new order button
+* Recent orders widget
+* Notifications panel
+* Better spacing and layout
+
+3. Order Creation Page
+   Redesign:
+
+* Category tabs
+* Menu cards with images
+* Quantity stepper
+* Live bill preview
+* Notes input
+* Floating action button for send to kitchen
+
+4. Kitchen Dashboard
+   Redesign:
+
+* Live incoming order cards
+* Priority badges
+* Cooking timers
+* Progress indicators
+* Quick status buttons
+* Better readability
+
+5. Accountant Dashboard
+   Redesign:
+
+* Billing cards
+* Payment summary UI
+* Payment method cards
+* Invoice preview modal
+* Sales quick stats
+
+6. Owner Dashboard
+   Redesign:
+
+* Analytics cards
+* Revenue charts
+* Top-selling items
+* Staff performance cards
+* Inventory alerts
+* Profit widgets
+
+7. Menu Management
+   Redesign:
+
+* Table layout
+* Add/edit modal
+* Search/filter
+* Category chips
+
+8. Inventory Management
+   Redesign:
+
+* Stock cards
+* Low stock warning badges
+* Inventory table
+* Quick update modal
+
+Requirements:
+
+* Use reusable components
+* Create a consistent design system
+* Improve spacing and alignment
+* Better typography hierarchy
+* Improve responsiveness
+* Better button styles
+* Better form styles
+* Better card layouts
+* Better tables
+* Better modals
+* Better loading states
+* Better empty states
+
+Component requirements:
+
+* Sidebar component
+* Navbar component
+* Dashboard card component
+* Table card component
+* Order card component
+* Modal component
+* Button component
+* Input component
+* Status badge component
+
+Use:
+
+* Clean grid layouts
+* Framer-motion animations
+* Lucide icons
+* Responsive design
+* Professional dashboard patterns
+
+Refactor the existing UI without changing business logic or API functionality.
+Only improve design, user experience, and component structure.
