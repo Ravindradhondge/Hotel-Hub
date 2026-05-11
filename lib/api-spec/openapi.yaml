@@ -28,6 +28,8 @@ tags:
     description: User/staff management
   - name: analytics
     description: Analytics and reporting
+  - name: attendance
+    description: Staff attendance tracking
 paths:
   /healthz:
     get:
@@ -940,6 +942,100 @@ paths:
                 items:
                   $ref: "#/components/schemas/StaffPerformance"
 
+  /attendance/check-in:
+    post:
+      operationId: checkIn
+      tags: [attendance]
+      summary: Staff check in for today
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Check-in recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRecord"
+        "400":
+          description: Already checked in today
+
+  /attendance/check-out:
+    post:
+      operationId: checkOut
+      tags: [attendance]
+      summary: Staff check out for today
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Check-out recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRecord"
+        "400":
+          description: No check-in found
+
+  /attendance/my-today:
+    get:
+      operationId: getMyTodayAttendance
+      tags: [attendance]
+      summary: Get current user today attendance
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Today attendance record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRecord"
+        "404":
+          description: No record for today
+
+  /attendance/today:
+    get:
+      operationId: getTodayAttendance
+      tags: [attendance]
+      summary: Get all staff today attendance (owner)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Today attendance summary
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttendanceSummaryItem"
+
+  /attendance:
+    get:
+      operationId: getAttendanceHistory
+      tags: [attendance]
+      summary: Get attendance history (owner)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Attendance records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttendanceRecord"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1552,3 +1648,55 @@ components:
         - role
         - totalOrders
         - totalRevenue
+
+    AttendanceRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        userName:
+          type: string
+        userRole:
+          type: string
+        date:
+          type: string
+        checkIn:
+          type: string
+          nullable: true
+        checkOut:
+          type: string
+          nullable: true
+        status:
+          type: string
+      required:
+        - id
+        - userId
+        - userName
+        - userRole
+        - date
+        - status
+
+    AttendanceSummaryItem:
+      type: object
+      properties:
+        userId:
+          type: integer
+        userName:
+          type: string
+        userRole:
+          type: string
+        checkIn:
+          type: string
+          nullable: true
+        checkOut:
+          type: string
+          nullable: true
+        status:
+          type: string
+      required:
+        - userId
+        - userName
+        - userRole
+        - status

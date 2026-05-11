@@ -17,6 +17,8 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AttendanceRecord,
+  AttendanceSummaryItem,
   CreateExpenseBody,
   CreateInventoryItemBody,
   CreateMenuItemBody,
@@ -28,6 +30,7 @@ import type {
   DailyRevenue,
   ErrorResponse,
   Expense,
+  GetAttendanceHistoryParams,
   GetDailyReportParams,
   GetMonthlyChartParams,
   GetTopSellingItemsParams,
@@ -3828,6 +3831,418 @@ export function useGetStaffPerformance<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getGetStaffPerformanceQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Staff check in for today
+ */
+export const getCheckInUrl = () => {
+  return `/api/attendance/check-in`;
+};
+
+export const checkIn = async (
+  options?: RequestInit,
+): Promise<AttendanceRecord> => {
+  return customFetch<AttendanceRecord>(getCheckInUrl(), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getCheckInMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof checkIn>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof checkIn>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["checkIn"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof checkIn>>,
+    void
+  > = () => {
+    return checkIn(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CheckInMutationResult = NonNullable<
+  Awaited<ReturnType<typeof checkIn>>
+>;
+
+export type CheckInMutationError = ErrorType<void>;
+
+/**
+ * @summary Staff check in for today
+ */
+export const useCheckIn = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof checkIn>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof checkIn>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getCheckInMutationOptions(options));
+};
+
+/**
+ * @summary Staff check out for today
+ */
+export const getCheckOutUrl = () => {
+  return `/api/attendance/check-out`;
+};
+
+export const checkOut = async (
+  options?: RequestInit,
+): Promise<AttendanceRecord> => {
+  return customFetch<AttendanceRecord>(getCheckOutUrl(), {
+    ...options,
+    method: "POST",
+  });
+};
+
+export const getCheckOutMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof checkOut>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof checkOut>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["checkOut"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof checkOut>>,
+    void
+  > = () => {
+    return checkOut(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CheckOutMutationResult = NonNullable<
+  Awaited<ReturnType<typeof checkOut>>
+>;
+
+export type CheckOutMutationError = ErrorType<void>;
+
+/**
+ * @summary Staff check out for today
+ */
+export const useCheckOut = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof checkOut>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof checkOut>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(getCheckOutMutationOptions(options));
+};
+
+/**
+ * @summary Get current user today attendance
+ */
+export const getGetMyTodayAttendanceUrl = () => {
+  return `/api/attendance/my-today`;
+};
+
+export const getMyTodayAttendance = async (
+  options?: RequestInit,
+): Promise<AttendanceRecord> => {
+  return customFetch<AttendanceRecord>(getGetMyTodayAttendanceUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetMyTodayAttendanceQueryKey = () => {
+  return [`/api/attendance/my-today`] as const;
+};
+
+export const getGetMyTodayAttendanceQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMyTodayAttendance>>,
+  TError = ErrorType<void>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getMyTodayAttendance>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMyTodayAttendanceQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getMyTodayAttendance>>
+  > = ({ signal }) => getMyTodayAttendance({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMyTodayAttendance>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetMyTodayAttendanceQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMyTodayAttendance>>
+>;
+export type GetMyTodayAttendanceQueryError = ErrorType<void>;
+
+/**
+ * @summary Get current user today attendance
+ */
+
+export function useGetMyTodayAttendance<
+  TData = Awaited<ReturnType<typeof getMyTodayAttendance>>,
+  TError = ErrorType<void>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getMyTodayAttendance>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetMyTodayAttendanceQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get all staff today attendance (owner)
+ */
+export const getGetTodayAttendanceUrl = () => {
+  return `/api/attendance/today`;
+};
+
+export const getTodayAttendance = async (
+  options?: RequestInit,
+): Promise<AttendanceSummaryItem[]> => {
+  return customFetch<AttendanceSummaryItem[]>(getGetTodayAttendanceUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetTodayAttendanceQueryKey = () => {
+  return [`/api/attendance/today`] as const;
+};
+
+export const getGetTodayAttendanceQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTodayAttendance>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTodayAttendance>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetTodayAttendanceQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getTodayAttendance>>
+  > = ({ signal }) => getTodayAttendance({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTodayAttendance>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetTodayAttendanceQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTodayAttendance>>
+>;
+export type GetTodayAttendanceQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get all staff today attendance (owner)
+ */
+
+export function useGetTodayAttendance<
+  TData = Awaited<ReturnType<typeof getTodayAttendance>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTodayAttendance>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetTodayAttendanceQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get attendance history (owner)
+ */
+export const getGetAttendanceHistoryUrl = (
+  params?: GetAttendanceHistoryParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/attendance?${stringifiedParams}`
+    : `/api/attendance`;
+};
+
+export const getAttendanceHistory = async (
+  params?: GetAttendanceHistoryParams,
+  options?: RequestInit,
+): Promise<AttendanceRecord[]> => {
+  return customFetch<AttendanceRecord[]>(getGetAttendanceHistoryUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetAttendanceHistoryQueryKey = (
+  params?: GetAttendanceHistoryParams,
+) => {
+  return [`/api/attendance`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetAttendanceHistoryQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAttendanceHistory>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetAttendanceHistoryParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getAttendanceHistory>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetAttendanceHistoryQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAttendanceHistory>>
+  > = ({ signal }) =>
+    getAttendanceHistory(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAttendanceHistory>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetAttendanceHistoryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAttendanceHistory>>
+>;
+export type GetAttendanceHistoryQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get attendance history (owner)
+ */
+
+export function useGetAttendanceHistory<
+  TData = Awaited<ReturnType<typeof getAttendanceHistory>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetAttendanceHistoryParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getAttendanceHistory>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetAttendanceHistoryQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

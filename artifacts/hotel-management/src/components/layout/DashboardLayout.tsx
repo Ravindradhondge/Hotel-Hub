@@ -1,8 +1,12 @@
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "wouter";
-import { LogOut, LayoutDashboard, Utensils, Users, Package, FileText, ChefHat, Table2 } from "lucide-react";
+import { LogOut, LayoutDashboard, Utensils, Users, Package, FileText, ChefHat, Table2, CalendarCheck, LogIn, LogOut as LogOutIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useGetMyTodayAttendance, useCheckIn, useCheckOut } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { getGetMyTodayAttendanceQueryKey } from "@workspace/api-client-react";
+import { useToast } from "@/hooks/use-toast";
 
 const HOTEL_NAME = import.meta.env.VITE_HOTEL_NAME || "Shagun Tadka";
 
@@ -11,17 +15,81 @@ interface DashboardLayoutProps {
   title: string;
 }
 
+function AttendanceButton({ role }: { role: string }) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { data: record, isLoading } = useGetMyTodayAttendance({ query: { retry: false } });
+  const checkIn  = useCheckIn();
+  const checkOut = useCheckOut();
+
+  if (role === "owner") return null;
+
+  const refresh = () => queryClient.invalidateQueries({ queryKey: getGetMyTodayAttendanceQueryKey() });
+
+  const handleCheckIn = () => {
+    checkIn.mutate(undefined, {
+      onSuccess: () => { toast({ title: "Checked in ✓" }); refresh(); },
+      onError: (e: any) => toast({ title: e?.response?.data?.error ?? "Already checked in today", variant: "destructive" }),
+    });
+  };
+
+  const handleCheckOut = () => {
+    checkOut.mutate(undefined, {
+      onSuccess: () => { toast({ title: "Checked out ✓" }); refresh(); },
+      onError: (e: any) => toast({ title: e?.response?.data?.error ?? "Check-out failed", variant: "destructive" }),
+    });
+  };
+
+  if (isLoading) return <div className="h-9 rounded-xl bg-secondary animate-pulse" />;
+
+  if (!record) {
+    return (
+      <Button
+        variant="outline"
+        className="w-full justify-start rounded-xl h-9 text-sm text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
+        onClick={handleCheckIn}
+        disabled={checkIn.isPending}
+      >
+        <LogIn className="w-4 h-4 mr-2" />
+        Check In
+      </Button>
+    );
+  }
+
+  if (!record.checkOut) {
+    return (
+      <Button
+        variant="outline"
+        className="w-full justify-start rounded-xl h-9 text-sm text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700"
+        onClick={handleCheckOut}
+        disabled={checkOut.isPending}
+      >
+        <LogOutIcon className="w-4 h-4 mr-2" />
+        Check Out
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-secondary/60 text-xs text-muted-foreground">
+      <CalendarCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+      <span>Done for today</span>
+    </div>
+  );
+}
+
 export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   const { user, logout } = useAuth();
   const [location] = useLocation();
 
   const navigation = {
     owner: [
-      { name: "Overview",   href: "/owner",           icon: LayoutDashboard },
-      { name: "Menu",       href: "/owner/menu",       icon: Utensils },
-      { name: "Inventory",  href: "/owner/inventory",  icon: Package },
-      { name: "Tables",     href: "/owner/tables",     icon: Table2 },
-      { name: "Staff",      href: "/owner/staff",      icon: Users },
+      { name: "Overview",   href: "/owner",            icon: LayoutDashboard },
+      { name: "Menu",       href: "/owner/menu",        icon: Utensils },
+      { name: "Inventory",  href: "/owner/inventory",   icon: Package },
+      { name: "Tables",     href: "/owner/tables",      icon: Table2 },
+      { name: "Staff",      href: "/owner/staff",       icon: Users },
+      { name: "Attendance", href: "/owner/attendance",  icon: CalendarCheck },
     ],
     waiter:     [{ name: "Tables",  href: "/waiter",     icon: LayoutDashboard }],
     kitchen:    [{ name: "Tickets", href: "/kitchen",    icon: FileText }],
@@ -121,8 +189,11 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-border">
-          <div className="flex items-center gap-3 mb-3 px-1">
+        <div className="p-4 border-t border-border space-y-2">
+          {user && user.role !== "owner" && (
+            <AttendanceButton role={user.role} />
+          )}
+          <div className="flex items-center gap-3 px-1">
             <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${roleAccent}`}>
               {user?.name?.charAt(0).toUpperCase()}
             </div>

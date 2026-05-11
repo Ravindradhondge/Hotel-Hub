@@ -769,3 +769,82 @@ export const GetStaffPerformanceResponseItem = zod.object({
 export const GetStaffPerformanceResponse = zod.array(
   GetStaffPerformanceResponseItem,
 );
+
+/**
+ * @summary Staff check in for today
+ */
+export const CheckInResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  userName: zod.string(),
+  userRole: zod.string(),
+  date: zod.string(),
+  checkIn: zod.string().nullish(),
+  checkOut: zod.string().nullish(),
+  status: zod.string(),
+});
+
+/**
+ * @summary Staff check out for today
+ */
+export const CheckOutResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  userName: zod.string(),
+  userRole: zod.string(),
+  date: zod.string(),
+  checkIn: zod.string().nullish(),
+  checkOut: zod.string().nullish(),
+  status: zod.string(),
+});
+
+/**
+ * @summary Get current user today attendance
+ */
+export const GetMyTodayAttendanceResponse = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  userName: zod.string(),
+  userRole: zod.string(),
+  date: zod.string(),
+  checkIn: zod.string().nullish(),
+  checkOut: zod.string().nullish(),
+  status: zod.string(),
+});
+
+/**
+ * @summary Get all staff today attendance (owner)
+ */
+export const GetTodayAttendanceResponseItem = zod.object({
+  userId: zod.number(),
+  userName: zod.string(),
+  userRole: zod.string(),
+  checkIn: zod.string().nullish(),
+  checkOut: zod.string().nullish(),
+  status: zod.string(),
+});
+export const GetTodayAttendanceResponse = zod.array(
+  GetTodayAttendanceResponseItem,
+);
+
+/**
+ * @summary Get attendance history (owner)
+ */
+export const GetAttendanceHistoryQueryParams = zod.object({
+  startDate: zod.coerce.string().optional(),
+  endDate: zod.coerce.string().optional(),
+});
+
+export const GetAttendanceHistoryResponseItem = zod.object({
+  id: zod.number(),
+  userId: zod.number(),
+  userName: zod.string(),
+  userRole: zod.string(),
+  date: zod.string(),
+  checkIn: zod.string().nullish(),
+  checkOut: zod.string().nullish(),
+  status: zod.string(),
+});
+export const GetAttendanceHistoryResponse = zod.array(
+  GetAttendanceHistoryResponseItem,
+);

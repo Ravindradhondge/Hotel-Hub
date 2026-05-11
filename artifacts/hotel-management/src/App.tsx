@@ -13,6 +13,7 @@ import MenuManagement from "@/pages/MenuManagement";
 import InventoryManagement from "@/pages/InventoryManagement";
 import StaffManagement from "@/pages/StaffManagement";
 import TableManagement from "@/pages/TableManagement";
+import AttendanceDashboard from "@/pages/AttendanceDashboard";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -55,6 +56,9 @@ function AppRouter() {
       </Route>
       <Route path="/owner/tables">
         <ProtectedRoute allowedRoles={["owner"]}><TableManagement /></ProtectedRoute>
+      </Route>
+      <Route path="/owner/attendance">
+        <ProtectedRoute allowedRoles={["owner"]}><AttendanceDashboard /></ProtectedRoute>
       </Route>
       <Route path="/" component={RoleRedirect} />
       <Route component={NotFound} />

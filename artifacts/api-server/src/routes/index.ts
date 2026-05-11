@@ -9,6 +9,7 @@ import inventoryRouter from "./inventory";
 import expensesRouter from "./expenses";
 import usersRouter from "./users";
 import analyticsRouter from "./analytics";
+import attendanceRouter from "./attendance";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(inventoryRouter);
 router.use(expensesRouter);
 router.use(usersRouter);
 router.use(analyticsRouter);
+router.use(attendanceRouter);
 
 export default router;

@@ -355,6 +355,26 @@ export interface StaffPerformance {
   totalRevenue: number;
 }
 
+export interface AttendanceRecord {
+  id: number;
+  userId: number;
+  userName: string;
+  userRole: string;
+  date: string;
+  checkIn?: string | null;
+  checkOut?: string | null;
+  status: string;
+}
+
+export interface AttendanceSummaryItem {
+  userId: number;
+  userName: string;
+  userRole: string;
+  checkIn?: string | null;
+  checkOut?: string | null;
+  status: string;
+}
+
 export type ListMenuItemsParams = {
   category?: string;
   available?: boolean;
@@ -388,4 +408,9 @@ export type GetMonthlyChartParams = {
 export type ListExpensesParams = {
   month?: number;
   year?: number;
+};
+
+export type GetAttendanceHistoryParams = {
+  startDate?: string;
+  endDate?: string;
 };
