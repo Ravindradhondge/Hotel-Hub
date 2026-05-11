@@ -33,7 +33,7 @@ async function formatRecord(r: typeof attendanceTable.$inferSelect) {
 }
 
 router.post("/attendance/check-in", authenticate, async (req, res) => {
-  const userId = (req as any).user?.id;
+  const userId = req.user?.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
 
   const today = todayStr();
@@ -55,7 +55,7 @@ router.post("/attendance/check-in", authenticate, async (req, res) => {
 });
 
 router.post("/attendance/check-out", authenticate, async (req, res) => {
-  const userId = (req as any).user?.id;
+  const userId = req.user?.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
 
   const today = todayStr();
@@ -80,7 +80,7 @@ router.post("/attendance/check-out", authenticate, async (req, res) => {
 });
 
 router.get("/attendance/my-today", authenticate, async (req, res) => {
-  const userId = (req as any).user?.id;
+  const userId = req.user?.userId;
   if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
 
   const [record] = await db.select().from(attendanceTable)
