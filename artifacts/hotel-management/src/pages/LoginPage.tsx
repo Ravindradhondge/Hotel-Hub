@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { LayoutDashboard, UtensilsCrossed, ChefHat, Receipt } from "lucide-react";
 
+const HOTEL_NAME = import.meta.env.VITE_HOTEL_NAME || "Shagun Tadka";
+
 const ROLES = [
   { label: "Owner",      icon: LayoutDashboard, desc: "Full analytics, menu & staff control" },
   { label: "Waiter",     icon: UtensilsCrossed, desc: "Table management & order creation" },
@@ -52,7 +54,7 @@ export default function LoginPage() {
               <ChefHat className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-serif font-bold text-white leading-none">Shagun Tadka</h1>
+              <h1 className="text-2xl font-serif font-bold text-white leading-none">{HOTEL_NAME}</h1>
               <p className="text-white/60 text-xs mt-0.5">Restaurant Management</p>
             </div>
           </div>
@@ -75,7 +77,7 @@ export default function LoginPage() {
           })}
         </div>
 
-        <p className="relative text-white/30 text-xs">&copy; {new Date().getFullYear()} Shagun Tadka</p>
+        <p className="relative text-white/30 text-xs">&copy; {new Date().getFullYear()} {HOTEL_NAME}</p>
       </div>
 
       {/* ── Right login form ── */}
@@ -86,7 +88,7 @@ export default function LoginPage() {
               <ChefHat className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-serif font-bold text-foreground leading-none">Shagun Tadka</h1>
+              <h1 className="text-xl font-serif font-bold text-foreground leading-none">{HOTEL_NAME}</h1>
               <p className="text-muted-foreground text-xs mt-0.5">Restaurant Management</p>
             </div>
           </div>

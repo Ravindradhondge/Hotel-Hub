@@ -4,6 +4,8 @@ import { Link, useLocation } from "wouter";
 import { LogOut, LayoutDashboard, Utensils, Users, Package, FileText, ChefHat, Table2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const HOTEL_NAME = import.meta.env.VITE_HOTEL_NAME || "Shagun Tadka";
+
 interface DashboardLayoutProps {
   children: React.ReactNode;
   title: string;
@@ -47,7 +49,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
               <ChefHat className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-sm font-serif font-bold text-foreground leading-none">Shagun Tadka</p>
+              <p className="text-sm font-serif font-bold text-foreground leading-none">{HOTEL_NAME}</p>
               <p className="text-[10px] text-muted-foreground capitalize mt-0.5">{user?.role} Portal</p>
             </div>
           </div>
@@ -94,7 +96,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
               <ChefHat className="w-4.5 h-4.5 text-white" />
             </div>
             <div>
-              <h1 className="text-base font-serif font-bold text-foreground leading-none">Shagun Tadka</h1>
+              <h1 className="text-base font-serif font-bold text-foreground leading-none">{HOTEL_NAME}</h1>
               <p className="text-xs text-muted-foreground capitalize mt-0.5">{user?.role} Portal</p>
             </div>
           </div>

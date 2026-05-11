@@ -215,7 +215,7 @@ export default function AccountantDashboard() {
           {invoiceOrder && (
             <div className="bg-secondary/30 rounded-xl p-4 space-y-3 font-mono text-sm">
               <div className="text-center border-b border-dashed border-border pb-3">
-                <p className="font-extrabold text-lg font-serif">Shagun Tadka</p>
+                <p className="font-extrabold text-lg font-serif">{import.meta.env.VITE_HOTEL_NAME || "Shagun Tadka"}</p>
                 <p className="text-muted-foreground text-xs">{new Date().toLocaleDateString("en-IN", { dateStyle: "medium" })}</p>
                 <p className="text-xs mt-1">Table: {invoiceOrder.tableNumber} | Served by: {invoiceOrder.waiterName}</p>
               </div>
@@ -230,7 +230,7 @@ export default function AccountantDashboard() {
                 <div className="flex justify-between text-muted-foreground"><span>GST 5%</span><span>₹{(invoiceOrder.totalAmount * 0.05).toFixed(0)}</span></div>
                 <div className="flex justify-between font-extrabold border-t border-dashed border-border pt-1 text-base"><span>TOTAL</span><span>₹{(invoiceOrder.totalAmount * 1.05).toFixed(0)}</span></div>
               </div>
-              <p className="text-center text-xs text-muted-foreground pt-1">Thank you for visiting Shagun Tadka!</p>
+              <p className="text-center text-xs text-muted-foreground pt-1">Thank you for visiting {import.meta.env.VITE_HOTEL_NAME || "Shagun Tadka"}!</p>
             </div>
           )}
           <DialogFooter>
