@@ -18,7 +18,7 @@ interface DashboardLayoutProps {
 function useAttendanceActions() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { data: record, isLoading } = useGetMyTodayAttendance({ query: { retry: false } });
+  const { data: record, isLoading } = useGetMyTodayAttendance({ query: { retry: false, queryKey: getGetMyTodayAttendanceQueryKey() } });
   const checkIn  = useCheckIn();
   const checkOut = useCheckOut();
 

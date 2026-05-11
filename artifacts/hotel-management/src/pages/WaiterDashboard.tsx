@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useListTables, useGetTablesSummary, useListMenuItems, useListMenuCategories,
@@ -23,7 +23,7 @@ const TABLE_STATUS_STYLE: Record<string, { card: string; dot: string; label: str
   billing:   { card: "bg-rose-50 border-rose-300 hover:border-rose-400",           dot: "bg-rose-500",    label: "text-rose-700" },
 };
 
-const TABLE_STATUS_ICON: Record<string, JSX.Element> = {
+const TABLE_STATUS_ICON: Record<string, React.ReactElement> = {
   available:  <UtensilsCrossed className="w-4 h-4 opacity-40" />,
   occupied:   <Clock className="w-4 h-4 opacity-60" />,
   cooking:    <Flame className="w-4 h-4 opacity-70" />,
@@ -408,13 +408,13 @@ export default function WaiterDashboard() {
 
       {/* ── View existing order dialog ── */}
       <Dialog open={!!viewOrderTable} onOpenChange={() => setViewOrderTable(null)}>
-        <DialogContent className="max-w-sm rounded-2xl">
+        <DialogContent className="max-w-sm w-[calc(100vw-2rem)] rounded-2xl max-h-[90vh] flex flex-col p-0 gap-0">
           {viewOrderTable && (() => {
             const order = getTableOrder(viewOrderTable.id);
             const style = TABLE_STATUS_STYLE[viewOrderTable.status] ?? TABLE_STATUS_STYLE.available;
             return (
               <>
-                <DialogHeader>
+                <DialogHeader className="px-5 pt-5 pb-4 border-b border-border shrink-0">
                   <DialogTitle className="flex items-center gap-2">
                     Table {viewOrderTable.number}
                     <span className={`ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${style.label} bg-white border border-current/20`}>
@@ -423,8 +423,10 @@ export default function WaiterDashboard() {
                     </span>
                   </DialogTitle>
                 </DialogHeader>
+                {/* Scrollable content */}
+                <div className="overflow-y-auto flex-1 px-5 py-4">
                 {order ? (
-                  <div className="space-y-4 mt-1">
+                  <div className="space-y-4">
                     <div className="bg-secondary/40 rounded-xl p-3 space-y-2">
                       {order.items.map((item) => (
                         <div key={item.id} className="flex justify-between text-sm">
@@ -466,6 +468,7 @@ export default function WaiterDashboard() {
                 ) : (
                   <p className="text-muted-foreground text-sm mt-2">No active order for this table.</p>
                 )}
+                </div> {/* end scrollable area */}
               </>
             );
           })()}

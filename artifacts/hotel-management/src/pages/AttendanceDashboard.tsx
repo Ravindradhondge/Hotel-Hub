@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useGetTodayAttendance, useGetAttendanceHistory } from "@workspace/api-client-react";
+import { useGetTodayAttendance, useGetAttendanceHistory, getGetAttendanceHistoryQueryKey } from "@workspace/api-client-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Users, Clock, UserCheck, UserX, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export default function AttendanceDashboard() {
   const endDate = new Date(historyMonth.year, historyMonth.month, 0).toISOString().slice(0, 10);
   const { data: historyData = [], isLoading: historyLoading } = useGetAttendanceHistory(
     { startDate, endDate },
-    { query: { enabled: tab === "history" } }
+    { query: { enabled: tab === "history", queryKey: getGetAttendanceHistoryQueryKey({ startDate, endDate }) } }
   );
 
   const presentCount = todayData.filter((s) => s.status === "present").length;
