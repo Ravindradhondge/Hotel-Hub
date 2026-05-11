@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { io } from "socket.io-client";
-import { Plus, Minus, Search, Clock, ShoppingBag, Flame, CheckCircle2, Receipt, UtensilsCrossed, ChevronRight } from "lucide-react";
+import { Plus, Minus, Search, Clock, ShoppingBag, Flame, CheckCircle2, Receipt, UtensilsCrossed, ChevronRight, XCircle } from "lucide-react";
 
 const TABLE_STATUS_STYLE: Record<string, { card: string; dot: string; label: string }> = {
   available: { card: "bg-emerald-50 border-emerald-300 hover:border-emerald-400", dot: "bg-emerald-500", label: "text-emerald-700" },
@@ -128,6 +128,22 @@ export default function WaiterDashboard() {
           queryClient.invalidateQueries({ queryKey: getListTablesQueryKey() });
           queryClient.invalidateQueries({ queryKey: getListOrdersQueryKey({}) });
         },
+      }
+    );
+  };
+
+  const handleCancelOrder = (order: Order) => {
+    updateOrder.mutate(
+      { id: order.id, data: { status: "cancelled" } },
+      {
+        onSuccess: () => {
+          toast({ title: "Order cancelled" });
+          setViewOrderTable(null);
+          queryClient.invalidateQueries({ queryKey: getListTablesQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetTablesSummaryQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getListOrdersQueryKey({}) });
+        },
+        onError: () => toast({ title: "Failed to cancel order", variant: "destructive" }),
       }
     );
   };
@@ -433,6 +449,18 @@ export default function WaiterDashboard() {
                       <div className="text-center text-sm text-muted-foreground bg-secondary/40 rounded-xl py-3">
                         Bill requested — awaiting payment
                       </div>
+                    )}
+                    {(order.status === "pending" || order.status === "preparing") && (
+                      <Button
+                        variant="outline"
+                        className="w-full rounded-xl h-11 font-semibold text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() => handleCancelOrder(order)}
+                        disabled={updateOrder.isPending}
+                        data-testid="button-cancel-order"
+                      >
+                        <XCircle className="w-4 h-4 mr-2" />
+                        {updateOrder.isPending ? "Cancelling…" : "Cancel Order"}
+                      </Button>
                     )}
                   </div>
                 ) : (

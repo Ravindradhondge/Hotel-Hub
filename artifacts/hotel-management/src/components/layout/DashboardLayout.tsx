@@ -15,21 +15,19 @@ interface DashboardLayoutProps {
   title: string;
 }
 
-function AttendanceButton({ role }: { role: string }) {
+function useAttendanceActions() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { data: record, isLoading } = useGetMyTodayAttendance({ query: { retry: false } });
   const checkIn  = useCheckIn();
   const checkOut = useCheckOut();
 
-  if (role === "owner") return null;
-
   const refresh = () => queryClient.invalidateQueries({ queryKey: getGetMyTodayAttendanceQueryKey() });
 
   const handleCheckIn = () => {
     checkIn.mutate(undefined, {
       onSuccess: () => { toast({ title: "Checked in ✓" }); refresh(); },
-      onError: (e: any) => toast({ title: e?.response?.data?.error ?? "Already checked in today", variant: "destructive" }),
+      onError: (e: any) => toast({ title: e?.response?.data?.error ?? "Check-in failed", variant: "destructive" }),
     });
   };
 
@@ -40,16 +38,18 @@ function AttendanceButton({ role }: { role: string }) {
     });
   };
 
+  return { record, isLoading, handleCheckIn, handleCheckOut, checkInPending: checkIn.isPending, checkOutPending: checkOut.isPending };
+}
+
+function AttendanceButton({ role }: { role: string }) {
+  const { record, isLoading, handleCheckIn, handleCheckOut, checkInPending, checkOutPending } = useAttendanceActions();
+
+  if (role === "owner") return null;
   if (isLoading) return <div className="h-9 rounded-xl bg-secondary animate-pulse" />;
 
   if (!record) {
     return (
-      <Button
-        variant="outline"
-        className="w-full justify-start rounded-xl h-9 text-sm text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700"
-        onClick={handleCheckIn}
-        disabled={checkIn.isPending}
-      >
+      <Button variant="outline" className="w-full justify-start rounded-xl h-9 text-sm text-emerald-600 border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700" onClick={handleCheckIn} disabled={checkInPending}>
         <LogIn className="w-4 h-4 mr-2" />
         Check In
       </Button>
@@ -58,12 +58,7 @@ function AttendanceButton({ role }: { role: string }) {
 
   if (!record.checkOut) {
     return (
-      <Button
-        variant="outline"
-        className="w-full justify-start rounded-xl h-9 text-sm text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700"
-        onClick={handleCheckOut}
-        disabled={checkOut.isPending}
-      >
+      <Button variant="outline" className="w-full justify-start rounded-xl h-9 text-sm text-amber-600 border-amber-200 hover:bg-amber-50 hover:text-amber-700" onClick={handleCheckOut} disabled={checkOutPending}>
         <LogOutIcon className="w-4 h-4 mr-2" />
         Check Out
       </Button>
@@ -74,6 +69,48 @@ function AttendanceButton({ role }: { role: string }) {
     <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-secondary/60 text-xs text-muted-foreground">
       <CalendarCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
       <span>Done for today</span>
+    </div>
+  );
+}
+
+function MobileAttendanceBar({ role }: { role: string }) {
+  const { record, isLoading, handleCheckIn, handleCheckOut, checkInPending, checkOutPending } = useAttendanceActions();
+
+  if (role === "owner") return null;
+  if (isLoading) return (
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-card border-t border-border px-4 py-3">
+      <div className="h-11 rounded-xl bg-secondary animate-pulse" />
+    </div>
+  );
+
+  if (!record) {
+    return (
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-card border-t border-border px-4 py-3 shadow-lg">
+        <Button className="w-full h-11 rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleCheckIn} disabled={checkInPending}>
+          <LogIn className="w-4 h-4 mr-2" />
+          {checkInPending ? "Checking in…" : "Check In"}
+        </Button>
+      </div>
+    );
+  }
+
+  if (!record.checkOut) {
+    return (
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-card border-t border-border px-4 py-3 shadow-lg">
+        <Button variant="outline" className="w-full h-11 rounded-xl font-semibold text-amber-600 border-amber-300 hover:bg-amber-50" onClick={handleCheckOut} disabled={checkOutPending}>
+          <LogOutIcon className="w-4 h-4 mr-2" />
+          {checkOutPending ? "Checking out…" : "Check Out"}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-card border-t border-border px-4 py-3 shadow-lg">
+      <div className="flex items-center justify-center gap-2 h-11 rounded-xl bg-secondary/60 text-sm text-muted-foreground font-medium">
+        <CalendarCheck className="w-4 h-4 text-emerald-600" />
+        Done for today
+      </div>
     </div>
   );
 }
@@ -106,6 +143,8 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
   };
   const roleAccent = user ? ROLE_ACCENT[user.role] ?? "text-primary bg-secondary" : "text-primary bg-secondary";
 
+  const isNonOwner = user && user.role !== "owner";
+
   return (
     <div className="min-h-screen bg-background flex flex-col md:flex-row">
 
@@ -122,18 +161,11 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${roleAccent}`}>
-                {user?.name?.charAt(0).toUpperCase()}
-              </div>
-              <span className="text-sm font-medium max-w-[90px] truncate">{user?.name}</span>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${roleAccent}`}>
+              {user?.name?.charAt(0).toUpperCase()}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 w-8 h-8"
-              onClick={logout}
-            >
+            <span className="text-sm font-medium max-w-[80px] truncate">{user?.name}</span>
+            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 w-8 h-8" onClick={logout}>
               <LogOut className="w-4 h-4" />
             </Button>
           </div>
@@ -177,9 +209,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
             return (
               <Link key={link.href} href={link.href}>
                 <span className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm ${
-                  isActive
-                    ? "bg-primary text-primary-foreground font-semibold shadow-sm"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  isActive ? "bg-primary text-primary-foreground font-semibold shadow-sm" : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                 }`}>
                   <Icon className="w-4 h-4" />
                   {link.name}
@@ -190,9 +220,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
         </nav>
 
         <div className="p-4 border-t border-border space-y-2">
-          {user && user.role !== "owner" && (
-            <AttendanceButton role={user.role} />
-          )}
+          {isNonOwner && <AttendanceButton role={user!.role} />}
           <div className="flex items-center gap-3 px-1">
             <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${roleAccent}`}>
               {user?.name?.charAt(0).toUpperCase()}
@@ -202,11 +230,7 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
               <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-9 text-sm"
-            onClick={logout}
-          >
+          <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl h-9 text-sm" onClick={logout}>
             <LogOut className="w-4 h-4 mr-2" />
             Sign out
           </Button>
@@ -218,12 +242,16 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
         <header className="h-13 border-b border-border bg-card/80 backdrop-blur-sm flex items-center px-4 md:px-6 shrink-0 sticky top-0 z-10">
           <h2 className="text-base md:text-lg font-bold text-foreground">{title}</h2>
         </header>
-        <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+        {/* Extra bottom padding on mobile so content isn't hidden behind the sticky attendance bar */}
+        <div className={`flex-1 p-4 md:p-6 overflow-y-auto ${isNonOwner ? "pb-24 md:pb-6" : ""}`}>
           <div className="max-w-6xl mx-auto">
             {children}
           </div>
         </div>
       </main>
+
+      {/* ── Mobile sticky attendance bar (non-owner only) ── */}
+      {isNonOwner && <MobileAttendanceBar role={user!.role} />}
     </div>
   );
 }
