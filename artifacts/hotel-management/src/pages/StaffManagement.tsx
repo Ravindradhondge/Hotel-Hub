@@ -69,7 +69,7 @@ export default function StaffManagement() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="text-xs text-muted-foreground font-medium">{users.length} staff members</div>
-          <Button onClick={openCreate} className="rounded-xl h-9 font-semibold" data-testid="button-add-staff">
+          <Button onClick={openCreate} className="rounded-xl h-9 font-semibold">
             <Plus className="w-4 h-4 mr-1.5" /> Add Staff
           </Button>
         </div>
@@ -77,22 +77,61 @@ export default function StaffManagement() {
         {/* Role summary cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {(["owner", "waiter", "kitchen", "accountant"] as const).map((role) => (
-            <div key={role} className={`border rounded-2xl p-4 card-shadow ${ROLE_STYLE[role]} bg-opacity-40`}>
+            <div key={role} className={`border rounded-2xl p-4 card-shadow ${ROLE_STYLE[role]}`}>
               <div className="text-2xl font-extrabold">{byRole[role]}</div>
               <div className="text-xs font-semibold capitalize mt-0.5 opacity-70">{role}s</div>
             </div>
           ))}
         </div>
 
-        {/* Table */}
-        <div className="bg-card border border-border rounded-2xl overflow-hidden card-shadow">
+        {/* ── Mobile card list ── */}
+        <div className="md:hidden space-y-2">
+          {isLoading ? (
+            [...Array(3)].map((_, i) => <div key={i} className="h-20 rounded-2xl bg-secondary animate-pulse" />)
+          ) : users.length === 0 ? (
+            <div className="text-center py-16 text-muted-foreground">
+              <Users className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              <p className="font-medium">No staff members yet</p>
+            </div>
+          ) : users.map((user) => (
+            <div key={user.id} className="bg-card border border-border rounded-2xl p-4 card-shadow flex items-center gap-3">
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-base font-extrabold shrink-0 ${ROLE_AVATAR[user.role] ?? "bg-secondary text-primary"}`}>
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-sm truncate">{user.name}</div>
+                <div className="text-xs text-muted-foreground truncate">{user.email}</div>
+                <span className={`inline-block mt-1 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border ${ROLE_STYLE[user.role] ?? "bg-secondary"}`}>{user.role}</span>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <Button variant="outline" size="icon" className="w-9 h-9 rounded-xl" onClick={() => openEdit(user)}>
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="icon" className="w-9 h-9 rounded-xl text-destructive border-destructive/30 hover:bg-destructive/10">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className="rounded-2xl mx-4">
+                    <AlertDialogHeader><AlertDialogTitle>Remove {user.name}?</AlertDialogTitle><AlertDialogDescription>This will permanently remove this staff member.</AlertDialogDescription></AlertDialogHeader>
+                    <AlertDialogFooter><AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(user.id)} className="bg-destructive hover:bg-destructive/90 rounded-xl">Remove</AlertDialogAction></AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Desktop table ── */}
+        <div className="hidden md:block bg-card border border-border rounded-2xl overflow-hidden card-shadow">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-secondary/40">
                 <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground uppercase tracking-wide">Name</th>
-                <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">Email</th>
+                <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground uppercase tracking-wide">Email</th>
                 <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground uppercase tracking-wide">Role</th>
-                <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground uppercase tracking-wide hidden md:table-cell">Joined</th>
+                <th className="text-left px-4 py-3 text-xs font-bold text-muted-foreground uppercase tracking-wide hidden lg:table-cell">Joined</th>
                 <th className="text-right px-4 py-3 text-xs font-bold text-muted-foreground uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
@@ -109,7 +148,7 @@ export default function StaffManagement() {
                   </td>
                 </tr>
               ) : users.map((user) => (
-                <tr key={user.id} data-testid={`row-user-${user.id}`} className="hover:bg-secondary/20 transition-colors">
+                <tr key={user.id} className="hover:bg-secondary/20 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0 ${ROLE_AVATAR[user.role] ?? "bg-secondary text-primary"}`}>
@@ -118,17 +157,17 @@ export default function StaffManagement() {
                       <span className="font-semibold text-sm">{user.name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground text-sm hidden sm:table-cell">{user.email}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-sm">{user.email}</td>
                   <td className="px-4 py-3">
                     <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border capitalize ${ROLE_STYLE[user.role] ?? "bg-secondary text-secondary-foreground"}`}>{user.role}</span>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell">{new Date(user.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}</td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs hidden lg:table-cell">{new Date(user.createdAt).toLocaleDateString("en-IN", { dateStyle: "medium" })}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-lg" onClick={() => openEdit(user)} data-testid={`button-edit-${user.id}`}><Pencil className="w-3.5 h-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="w-8 h-8 rounded-lg" onClick={() => openEdit(user)}><Pencil className="w-3.5 h-3.5" /></Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="ghost" size="icon" className="w-8 h-8 rounded-lg text-destructive hover:text-destructive" data-testid={`button-delete-${user.id}`}><Trash2 className="w-3.5 h-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="w-8 h-8 rounded-lg text-destructive hover:text-destructive"><Trash2 className="w-3.5 h-3.5" /></Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="rounded-2xl">
                           <AlertDialogHeader><AlertDialogTitle>Remove {user.name}?</AlertDialogTitle><AlertDialogDescription>This will permanently remove this staff member.</AlertDialogDescription></AlertDialogHeader>
@@ -146,15 +185,15 @@ export default function StaffManagement() {
 
       {/* Add/edit dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-sm rounded-2xl">
+        <DialogContent className="max-w-sm rounded-2xl mx-4">
           <DialogHeader><DialogTitle>{editing ? "Edit Staff Member" : "Add Staff Member"}</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-1.5"><Label className="font-semibold text-sm">Full Name *</Label><Input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="John Doe" className="rounded-xl" data-testid="input-name" /></div>
-            <div className="space-y-1.5"><Label className="font-semibold text-sm">Email *</Label><Input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="john@hotel.com" className="rounded-xl" data-testid="input-email" /></div>
+            <div className="space-y-1.5"><Label className="font-semibold text-sm">Full Name *</Label><Input value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder="John Doe" className="rounded-xl" /></div>
+            <div className="space-y-1.5"><Label className="font-semibold text-sm">Email *</Label><Input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} placeholder="john@hotel.com" className="rounded-xl" /></div>
             <div className="space-y-1.5">
               <Label className="font-semibold text-sm">Role *</Label>
               <Select value={form.role} onValueChange={(v) => setForm((p) => ({ ...p, role: v }))}>
-                <SelectTrigger className="rounded-xl" data-testid="select-role"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
                 <SelectContent className="rounded-xl">
                   <SelectItem value="waiter">Waiter</SelectItem>
                   <SelectItem value="kitchen">Kitchen Staff</SelectItem>
@@ -163,11 +202,11 @@ export default function StaffManagement() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5"><Label className="font-semibold text-sm">{editing ? "New Password (leave blank to keep)" : "Password *"}</Label><Input type="password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} placeholder="••••••••" className="rounded-xl" data-testid="input-password" /></div>
+            <div className="space-y-1.5"><Label className="font-semibold text-sm">{editing ? "New Password (leave blank to keep)" : "Password *"}</Label><Input type="password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} placeholder="••••••••" className="rounded-xl" /></div>
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" className="rounded-xl" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button className="rounded-xl font-semibold" onClick={handleSubmit} disabled={createUser.isPending || updateUser.isPending} data-testid="button-save">{editing ? "Save Changes" : "Add Staff"}</Button>
+            <Button className="rounded-xl font-semibold" onClick={handleSubmit} disabled={createUser.isPending || updateUser.isPending}>{editing ? "Save Changes" : "Add Staff"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
