@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useGetMe, getGetMeQueryKey, User } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 
 interface AuthContextType {
@@ -16,6 +17,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("hms_token"));
   const [user, setUser] = useState<User | null>(null);
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
   const { data: me, isLoading, error } = useGetMe({
     query: {
@@ -38,12 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [error]);
 
   const login = (newToken: string, newUser: User) => {
+    queryClient.clear();
     localStorage.setItem("hms_token", newToken);
     setToken(newToken);
     setUser(newUser);
   };
 
   const logout = () => {
+    queryClient.clear();
     localStorage.removeItem("hms_token");
     setToken(null);
     setUser(null);
