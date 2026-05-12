@@ -1,1 +1,90 @@
-[]
+[
+  {
+    "id": "a1b2c3d4-0001-4000-8000-000000000001",
+    "position": 1,
+    "filepath": "src/pages/slides/Slide01Title.tsx",
+    "title": "Shagun Tadka — Restaurant Management System",
+    "description": "Title slide with hero dashboard image, key stats, and brand identity",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0002-4000-8000-000000000002",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide02WhatIs.tsx",
+    "title": "What is Shagun Tadka?",
+    "description": "Overview of the app — four role-based dashboards, real-time orders, JWT auth, mobile-first",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0003-4000-8000-000000000003",
+    "position": 3,
+    "filepath": "src/pages/slides/Slide03TechStack.tsx",
+    "title": "Technology Stack at a Glance",
+    "description": "Five-column grid: Frontend, Backend, Database, API Design, Tooling",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0004-4000-8000-000000000004",
+    "position": 4,
+    "filepath": "src/pages/slides/Slide04Architecture.tsx",
+    "title": "System Architecture",
+    "description": "Browser ↔ REST API ↔ PostgreSQL flow, real-time layer, monorepo structure, JWT auth",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0005-4000-8000-000000000005",
+    "position": 5,
+    "filepath": "src/pages/slides/Slide05Frontend.tsx",
+    "title": "Frontend — React + Vite",
+    "description": "Seven frontend technologies with descriptions: React, Vite, Wouter, TanStack Query, Shadcn, Orval, Socket.IO",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0006-4000-8000-000000000006",
+    "position": 6,
+    "filepath": "src/pages/slides/Slide06Backend.tsx",
+    "title": "Backend — Node.js + Express 5",
+    "description": "Dark-themed slide covering Node.js, Express 5, JWT, Zod, Socket.IO, role middleware, Pino",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0007-4000-8000-000000000007",
+    "position": 7,
+    "filepath": "src/pages/slides/Slide07Database.tsx",
+    "title": "Database — PostgreSQL + Drizzle ORM",
+    "description": "Database layer with all 9 tables listed: users, tables, menu_items, orders, etc.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0008-4000-8000-000000000008",
+    "position": 8,
+    "filepath": "src/pages/slides/Slide08Dashboards.tsx",
+    "title": "Four Role-Based Dashboards",
+    "description": "Four-column layout: Waiter, Kitchen, Accountant, Owner with their key actions",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0009-4000-8000-000000000009",
+    "position": 9,
+    "filepath": "src/pages/slides/Slide09Features.tsx",
+    "title": "Key Features",
+    "description": "Six feature cards: Real-time orders, Mobile-first, Attendance, Expenses, GST Billing, Inventory Alerts",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0010-4000-8000-000000000010",
+    "position": 10,
+    "filepath": "src/pages/slides/Slide10APIDesign.tsx",
+    "title": "API Design — Contract First",
+    "description": "OpenAPI → Orval codegen → React Query hooks → Zod validation flow with code snippet",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0011-4000-8000-000000000011",
+    "position": 11,
+    "filepath": "src/pages/slides/Slide11ThankYou.tsx",
+    "title": "Thank You",
+    "description": "Closing slide with demo credentials for all four roles",
+    "speakerNotes": ""
+  }
+]

@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "LsxeM5c6u5KGdgxzvPLPg"
+uri = "file://artifacts/shagun-tadka-slides/public/hero-title.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "2ZxMvrLpv8YOD5sIADffd"
+uri = "file://artifacts/shagun-tadka-slides/public/hero-tech.png"
+type = "image"
+title = "generated_image"
