@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/shagun-tadka-slides/"
+title = "Shagun Tadka — App Overview"
+version = "1.0.0"
+id = "artifacts/shagun-tadka-slides"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/shagun-tadka-slides/" ]
+localPort = 24293
+
+[services.development]
+run = "pnpm --filter @workspace/shagun-tadka-slides run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/shagun-tadka-slides", "run", "build" ]
+publicDir = "artifacts/shagun-tadka-slides/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24293"
+BASE_PATH = "/shagun-tadka-slides/"
