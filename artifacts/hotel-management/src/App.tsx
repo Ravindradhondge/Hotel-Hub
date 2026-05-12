@@ -14,6 +14,7 @@ import InventoryManagement from "@/pages/InventoryManagement";
 import StaffManagement from "@/pages/StaffManagement";
 import TableManagement from "@/pages/TableManagement";
 import AttendanceDashboard from "@/pages/AttendanceDashboard";
+import ExpenseManagement from "@/pages/ExpenseManagement";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -59,6 +60,9 @@ function AppRouter() {
       </Route>
       <Route path="/owner/attendance">
         <ProtectedRoute allowedRoles={["owner"]}><AttendanceDashboard /></ProtectedRoute>
+      </Route>
+      <Route path="/owner/expenses">
+        <ProtectedRoute allowedRoles={["owner"]}><ExpenseManagement /></ProtectedRoute>
       </Route>
       <Route path="/" component={RoleRedirect} />
       <Route component={NotFound} />

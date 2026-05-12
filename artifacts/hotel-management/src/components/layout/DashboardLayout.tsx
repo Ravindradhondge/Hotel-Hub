@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useLocation } from "wouter";
-import { LogOut, LayoutDashboard, Utensils, Users, Package, FileText, ChefHat, Table2, CalendarCheck, LogIn, LogOut as LogOutIcon } from "lucide-react";
+import { LogOut, LayoutDashboard, Utensils, Users, Package, FileText, ChefHat, Table2, CalendarCheck, LogIn, LogOut as LogOutIcon, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetMyTodayAttendance, useCheckIn, useCheckOut } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -121,12 +121,13 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps) {
 
   const navigation = {
     owner: [
-      { name: "Overview",   href: "/owner",            icon: LayoutDashboard },
-      { name: "Menu",       href: "/owner/menu",        icon: Utensils },
-      { name: "Inventory",  href: "/owner/inventory",   icon: Package },
-      { name: "Tables",     href: "/owner/tables",      icon: Table2 },
-      { name: "Staff",      href: "/owner/staff",       icon: Users },
-      { name: "Attendance", href: "/owner/attendance",  icon: CalendarCheck },
+      { name: "Overview",   href: "/owner",             icon: LayoutDashboard },
+      { name: "Menu",       href: "/owner/menu",         icon: Utensils },
+      { name: "Inventory",  href: "/owner/inventory",    icon: Package },
+      { name: "Tables",     href: "/owner/tables",       icon: Table2 },
+      { name: "Staff",      href: "/owner/staff",        icon: Users },
+      { name: "Attendance", href: "/owner/attendance",   icon: CalendarCheck },
+      { name: "Expenses",   href: "/owner/expenses",     icon: Wallet },
     ],
     waiter:     [{ name: "Tables",  href: "/waiter",     icon: LayoutDashboard }],
     kitchen:    [{ name: "Tickets", href: "/kitchen",    icon: FileText }],

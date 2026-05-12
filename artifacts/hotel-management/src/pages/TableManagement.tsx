@@ -214,7 +214,7 @@ export default function TableManagement() {
 
         {/* Create / Edit dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="sm:max-w-sm rounded-2xl">
+          <DialogContent className="max-w-sm w-[calc(100vw-2rem)] rounded-2xl">
             <DialogHeader>
               <DialogTitle>{editing ? `Edit Table ${editing.number}` : "Add New Table"}</DialogTitle>
             </DialogHeader>

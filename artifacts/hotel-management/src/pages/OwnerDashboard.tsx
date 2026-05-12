@@ -1,6 +1,6 @@
 import { useGetOwnerDashboard, useGetTopSellingItems, useGetStaffPerformance, useGetMonthlyChart } from "@workspace/api-client-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, Users, Table2, AlertTriangle, IndianRupee, ShoppingBag } from "lucide-react";
 
 export default function OwnerDashboard() {
@@ -36,27 +36,27 @@ export default function OwnerDashboard() {
             </div>
 
             {/* Quick stats */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-card border border-border rounded-2xl p-4 text-center card-shadow">
-                <div className="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center mx-auto mb-2">
-                  <Users className="w-5 h-5 text-sky-600" />
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="bg-card border border-border rounded-2xl p-3 sm:p-4 text-center card-shadow">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-sky-50 flex items-center justify-center mx-auto mb-2">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-sky-600" />
                 </div>
-                <div className="text-2xl font-extrabold">{stats.todayCustomers}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">Customers Today</div>
+                <div className="text-xl sm:text-2xl font-extrabold">{stats.todayCustomers}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 leading-tight">Customers<br className="sm:hidden" /> Today</div>
               </div>
-              <div className={`border rounded-2xl p-4 text-center card-shadow ${stats.lowStockCount > 0 ? "bg-rose-50 border-rose-200" : "bg-emerald-50 border-emerald-200"}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 ${stats.lowStockCount > 0 ? "bg-rose-100" : "bg-emerald-100"}`}>
-                  <AlertTriangle className={`w-5 h-5 ${stats.lowStockCount > 0 ? "text-rose-600" : "text-emerald-600"}`} />
+              <div className={`border rounded-2xl p-3 sm:p-4 text-center card-shadow ${stats.lowStockCount > 0 ? "bg-rose-50 border-rose-200" : "bg-emerald-50 border-emerald-200"}`}>
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mx-auto mb-2 ${stats.lowStockCount > 0 ? "bg-rose-100" : "bg-emerald-100"}`}>
+                  <AlertTriangle className={`w-4 h-4 sm:w-5 sm:h-5 ${stats.lowStockCount > 0 ? "text-rose-600" : "text-emerald-600"}`} />
                 </div>
-                <div className={`text-2xl font-extrabold ${stats.lowStockCount > 0 ? "text-rose-600" : "text-emerald-600"}`}>{stats.lowStockCount}</div>
-                <div className={`text-xs mt-0.5 font-medium ${stats.lowStockCount > 0 ? "text-rose-600" : "text-emerald-600"}`}>Low Stock Alerts</div>
+                <div className={`text-xl sm:text-2xl font-extrabold ${stats.lowStockCount > 0 ? "text-rose-600" : "text-emerald-600"}`}>{stats.lowStockCount}</div>
+                <div className={`text-[10px] sm:text-xs mt-0.5 font-medium leading-tight ${stats.lowStockCount > 0 ? "text-rose-600" : "text-emerald-600"}`}>Low Stock<br className="sm:hidden" /> Alerts</div>
               </div>
-              <div className="bg-card border border-border rounded-2xl p-4 text-center card-shadow">
-                <div className="w-10 h-10 rounded-full bg-violet-50 flex items-center justify-center mx-auto mb-2">
-                  <Users className="w-5 h-5 text-violet-600" />
+              <div className="bg-card border border-border rounded-2xl p-3 sm:p-4 text-center card-shadow">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center mx-auto mb-2">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600" />
                 </div>
-                <div className="text-2xl font-extrabold">{staffPerf.length}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">Active Waiters</div>
+                <div className="text-xl sm:text-2xl font-extrabold">{staffPerf.length}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 leading-tight">Active<br className="sm:hidden" /> Waiters</div>
               </div>
             </div>
           </>
@@ -82,7 +82,7 @@ export default function OwnerDashboard() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(346 10% 92%)" />
               <XAxis dataKey="date" tickFormatter={(d) => new Date(d).getDate().toString()} tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `₹${v}`} width={52} />
+              <YAxis tick={{ fontSize: 10 }} tickFormatter={(v: number) => v >= 1000 ? `₹${(v / 1000).toFixed(0)}k` : `₹${v}`} width={44} />
               <Tooltip
                 formatter={(v: number) => [`₹${v.toFixed(0)}`, "Revenue"]}
                 labelFormatter={(d) => new Date(d).toLocaleDateString("en-IN", { dateStyle: "medium" })}
