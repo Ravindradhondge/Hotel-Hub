@@ -28,11 +28,20 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   cashier: ["billing"],
 };
 
+// Demo account fallback — used when Firestore rules are not yet configured
+const DEMO_ROLES: Record<string, { role: UserRole; name: string }> = {
+  "owner@hotel.com":   { role: "owner",   name: "Hotel Owner" },
+  "manager@hotel.com": { role: "manager", name: "Raj Manager" },
+  "waiter@hotel.com":  { role: "waiter",  name: "Amit Waiter" },
+  "cashier@hotel.com": { role: "cashier", name: "Priya Cashier" },
+};
+
 interface AuthContextType {
   currentUser: User | null;
   userProfile: UserProfile | null;
   role: UserRole | null;
   loading: boolean;
+  firestoreReady: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   hasPermission: (permission: string) => boolean;
@@ -44,10 +53,23 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
+function buildFallbackProfile(user: User): UserProfile {
+  const email = user.email ?? "";
+  const demo = DEMO_ROLES[email];
+  return {
+    uid: user.uid,
+    email,
+    name: demo?.name ?? user.displayName ?? email.split("@")[0],
+    role: demo?.role ?? "waiter",
+    createdAt: new Date().toISOString(),
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [firestoreReady, setFirestoreReady] = useState(true);
 
   async function login(email: string, password: string) {
     await signInWithEmailAndPassword(auth, email, password);
@@ -73,19 +95,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists()) {
             setUserProfile(userDoc.data() as UserProfile);
+            setFirestoreReady(true);
           } else {
-            const profile: UserProfile = {
-              uid: user.uid,
-              email: user.email!,
-              name: user.displayName || user.email!.split("@")[0],
-              role: "waiter",
-              createdAt: new Date().toISOString(),
-            };
-            await setDoc(doc(db, "users", user.uid), profile);
+            // Doc doesn't exist — try to create it
+            const profile = buildFallbackProfile(user);
+            try {
+              await setDoc(doc(db, "users", user.uid), profile);
+              setFirestoreReady(true);
+            } catch {
+              // Can't write — Firestore rules not set up yet; use fallback
+              setFirestoreReady(false);
+            }
             setUserProfile(profile);
           }
         } catch {
-          setUserProfile(null);
+          // Firestore read blocked — use email-based fallback so app still works
+          setFirestoreReady(false);
+          setUserProfile(buildFallbackProfile(user));
         }
       } else {
         setUserProfile(null);
@@ -97,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, userProfile, role, loading, login, logout, hasPermission }}
+      value={{ currentUser, userProfile, role, loading, firestoreReady, login, logout, hasPermission }}
     >
       {children}
     </AuthContext.Provider>
