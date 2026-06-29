@@ -1,0 +1,183 @@
+I want to redesign my Hotel Management System into a professional production-ready application.
+
+IMPORTANT:
+Do NOT create separate dashboards for Waiter, Kitchen, Accountant, or Owner.
+
+Instead, create ONE modern dashboard with Role-Based Access Control (RBAC).
+
+Technology Stack:
+- React (Vite)
+- Tailwind CSS
+- Firebase Authentication
+- Firebase Firestore Database
+- Firebase Storage
+- React Router
+- Context API
+- Framer Motion
+- Lucide React Icons
+
+Authentication:
+Use Firebase Authentication.
+Users can log in using email and password.
+
+Each user has one of these roles:
+- Owner
+- Manager
+- Waiter
+- Cashier
+
+Store the user role in Firestore.
+
+After login, redirect everyone to the same dashboard.
+
+The dashboard should automatically show or hide features depending on the logged-in user's role.
+
+Example:
+Owner:
+✔ Everything
+
+Manager:
+✔ Orders
+✔ Tables
+✔ Kitchen
+✔ Reports
+
+Waiter:
+✔ Tables
+✔ Take Orders
+✔ Order Status
+
+Cashier:
+✔ Billing
+✔ Payments
+✔ Invoice
+
+The layout must NOT change.
+Only menu permissions should change.
+
+Dashboard Layout:
+
+Left Sidebar
+--------------
+Dashboard
+Tables
+Orders
+Kitchen
+Billing
+Customers
+Menu
+Inventory
+Reports
+Settings
+Logout
+
+Top Navbar
+-----------
+Hotel Logo
+Hotel Name
+Current User
+Notification Icon
+Profile Menu
+
+Main Dashboard
+
+Cards:
+Today's Sales
+Active Tables
+Pending Orders
+Completed Orders
+
+Recent Orders Table
+
+Table Status Grid
+
+Quick Actions
+
+Recent Activity
+
+Features
+
+1. Table Management
+- Add Table
+- Edit Table
+- Change Status
+- Merge Tables
+
+2. Order Management
+- Create Order
+- Edit Order
+- Move Table
+- Split Bill
+- Add Notes
+- Live Status
+
+3. Kitchen Management
+- Incoming Orders
+- Preparing
+- Ready
+- Completed
+
+4. Billing
+- GST Calculation
+- Discount
+- Service Charge
+- Cash
+- Card
+- UPI
+- Print Invoice
+
+5. Customer Management
+- Name
+- Mobile
+- Visit History
+
+6. Menu Management
+- Categories
+- Food Items
+- Price
+- Availability
+
+7. Inventory
+- Stock
+- Low Stock Alerts
+- Purchase History
+
+8. Reports
+- Daily Sales
+- Monthly Sales
+- Top Selling Items
+- Revenue Graph
+- Table Occupancy
+
+Firebase Collections
+
+users
+tables
+orders
+orderItems
+menu
+customers
+payments
+inventory
+reports
+
+Requirements
+
+- Connect everything with Firebase Firestore.
+- Use real-time Firestore listeners.
+- Create reusable React components.
+- Use protected routes.
+- Use Firebase Authentication.
+- Create Firebase configuration.
+- Add loading states.
+- Add error handling.
+- Add toast notifications.
+- Mobile responsive.
+- Professional restaurant UI.
+- Modern SaaS dashboard design.
+- Clean code structure.
+- Production-ready folder structure.
+- Proper comments.
+- Follow React best practices.
+- Keep the UI modern, premium, and responsive.
+- Do not use dummy data. Fetch all data from Firebase Firestore.
