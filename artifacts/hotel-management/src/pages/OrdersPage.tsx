@@ -21,9 +21,21 @@ interface Order {
 }
 
 interface OrderItem {
-  name: string;
-  qty: number;
-  price: number;
+  name?: string;
+  menuItemName?: string;
+  qty?: number;
+  quantity?: number;
+  price?: number;
+  menuItemPrice?: number;
+  subtotal?: number;
+}
+
+function normItem(item: OrderItem) {
+  return {
+    name: item.name || item.menuItemName || "Unknown",
+    qty: item.qty ?? item.quantity ?? 1,
+    price: item.price ?? item.menuItemPrice ?? (item.subtotal ?? 0),
+  };
 }
 
 interface MenuItem {
@@ -174,7 +186,7 @@ export default function OrdersPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((order, i) => {
-            const cfg = statusConfig[order.status];
+            const cfg = statusConfig[order.status] ?? statusConfig.pending;
             return (
               <motion.div key={order.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                 className="card-dark p-4 flex flex-col gap-3">
@@ -188,9 +200,10 @@ export default function OrdersPage() {
                 <div className="text-sm text-slate-400">{order.customerName} · {Array.isArray(order.items) ? order.items.length : 0} items</div>
                 {Array.isArray(order.items) && (
                   <div className="text-xs text-slate-500 space-y-0.5">
-                    {order.items.slice(0, 3).map((item, idx) => (
-                      <div key={idx}>{item.qty}× {item.name} — ₹{(item.qty * item.price).toLocaleString("en-IN")}</div>
-                    ))}
+                    {order.items.slice(0, 3).map((raw, idx) => {
+                      const item = normItem(raw);
+                      return <div key={idx}>{item.qty}× {item.name} — ₹{(item.qty * item.price).toLocaleString("en-IN")}</div>;
+                    })}
                     {order.items.length > 3 && <div className="text-slate-600">+{order.items.length - 3} more</div>}
                   </div>
                 )}

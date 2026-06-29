@@ -1,16 +1,30 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChefHat, Clock, Flame, CheckCircle2 } from "lucide-react";
-import { collection, onSnapshot, updateDoc, doc, query, where, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, updateDoc, doc, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { toast } from "sonner";
+
+interface OrderItem {
+  name?: string;
+  menuItemName?: string;
+  qty?: number;
+  quantity?: number;
+}
+
+function normItem(item: OrderItem) {
+  return {
+    name: item.name || item.menuItemName || "Unknown",
+    qty: item.qty ?? item.quantity ?? 1,
+  };
+}
 
 interface Order {
   id: string;
   tableNumber: number;
   customerName: string;
   status: "pending" | "preparing" | "ready" | "completed";
-  items: { name: string; qty: number; price: number }[];
+  items: OrderItem[];
   notes?: string;
   createdAt: { toDate: () => Date } | string;
 }
@@ -50,11 +64,17 @@ export default function KitchenPage() {
     const unsub = onSnapshot(
       query(
         collection(db, "orders"),
-        where("status", "in", ["pending", "preparing", "ready"]),
-        orderBy("createdAt", "asc")
+        where("status", "in", ["pending", "preparing", "ready"])
       ),
       (snap) => {
-        setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() } as Order)));
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Order));
+        // Sort client-side to avoid needing a composite index
+        data.sort((a, b) => {
+          const da = a.createdAt && typeof a.createdAt === "object" && "toDate" in a.createdAt ? a.createdAt.toDate().getTime() : new Date(a.createdAt as string).getTime();
+          const db_ = b.createdAt && typeof b.createdAt === "object" && "toDate" in b.createdAt ? b.createdAt.toDate().getTime() : new Date(b.createdAt as string).getTime();
+          return da - db_;
+        });
+        setOrders(data);
         setLoading(false);
       }
     );
@@ -121,14 +141,17 @@ export default function KitchenPage() {
                       </div>
                       <div className="text-xs text-slate-400 mb-3 font-medium">{order.customerName}</div>
                       <div className="space-y-1 mb-3">
-                        {Array.isArray(order.items) && order.items.map((item, i) => (
-                          <div key={i} className="flex items-center gap-2 text-sm">
-                            <span className="w-5 h-5 bg-slate-700 rounded text-center text-xs font-bold text-slate-300 flex items-center justify-center">
-                              {item.qty}
-                            </span>
-                            <span className="text-slate-200">{item.name}</span>
-                          </div>
-                        ))}
+                        {Array.isArray(order.items) && order.items.map((raw, i) => {
+                          const item = normItem(raw);
+                          return (
+                            <div key={i} className="flex items-center gap-2 text-sm">
+                              <span className="w-5 h-5 bg-slate-700 rounded text-center text-xs font-bold text-slate-300 flex items-center justify-center">
+                                {item.qty}
+                              </span>
+                              <span className="text-slate-200">{item.name}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                       {order.notes && (
                         <div className="text-xs text-amber-400 bg-amber-500/10 rounded px-2 py-1 mb-3">

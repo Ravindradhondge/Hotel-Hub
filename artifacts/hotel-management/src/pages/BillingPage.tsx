@@ -2,18 +2,39 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Receipt, Printer, CheckCircle2, Percent, IndianRupee } from "lucide-react";
 import {
-  collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, serverTimestamp,
+  collection, onSnapshot, addDoc, updateDoc, doc, query, where, serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+
+interface OrderItem {
+  name?: string;
+  menuItemName?: string;
+  qty?: number;
+  quantity?: number;
+  price?: number;
+  menuItemPrice?: number;
+  subtotal?: number;
+}
+
+function normItem(item: OrderItem) {
+  const qty = item.qty ?? item.quantity ?? 1;
+  const price = item.price ?? item.menuItemPrice ?? 0;
+  return {
+    name: item.name || item.menuItemName || "Unknown",
+    qty,
+    price,
+    lineTotal: item.subtotal ?? qty * price,
+  };
+}
 
 interface Order {
   id: string;
   tableNumber: number;
   customerName: string;
   status: string;
-  items: { name: string; qty: number; price: number }[];
+  items: OrderItem[];
   total: number;
 }
 
@@ -52,10 +73,20 @@ export default function BillingPage() {
 
   useEffect(() => {
     const unsub = onSnapshot(
-      query(collection(db, "orders"), where("status", "in", ["ready", "completed"]), orderBy("createdAt", "desc")),
+      query(collection(db, "orders"), where("status", "in", ["ready", "completed"])),
       (snap) => {
-        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as Order));
-        setOrders(data.filter(o => o.status === "ready"));
+        const data = snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as Order))
+          .filter(o => o.status === "ready");
+        // Sort client-side to avoid composite index requirement
+        data.sort((a, b) => {
+          const getTime = (ts: unknown) => {
+            if (ts && typeof ts === "object" && "toDate" in (ts as { toDate: () => Date })) return (ts as { toDate: () => Date }).toDate().getTime();
+            return new Date(ts as string).getTime();
+          };
+          return getTime((b as unknown as Record<string, unknown>).createdAt) - getTime((a as unknown as Record<string, unknown>).createdAt);
+        });
+        setOrders(data);
         setLoading(false);
       }
     );
@@ -149,12 +180,15 @@ export default function BillingPage() {
                 <div>
                   <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Items</div>
                   <div className="space-y-1.5">
-                    {Array.isArray(selected.items) && selected.items.map((item, i) => (
-                      <div key={i} className="flex justify-between text-sm">
-                        <span className="text-slate-300">{item.qty}× {item.name}</span>
-                        <span className="text-slate-200">₹{(item.qty * item.price).toLocaleString("en-IN")}</span>
-                      </div>
-                    ))}
+                    {Array.isArray(selected.items) && selected.items.map((raw, i) => {
+                      const item = normItem(raw);
+                      return (
+                        <div key={i} className="flex justify-between text-sm">
+                          <span className="text-slate-300">{item.qty}× {item.name}</span>
+                          <span className="text-slate-200">₹{item.lineTotal.toLocaleString("en-IN")}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 

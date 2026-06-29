@@ -10,14 +10,29 @@ import {
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
 
+interface OrderItem {
+  name?: string;
+  menuItemName?: string;
+  qty?: number;
+  quantity?: number;
+  price?: number;
+  menuItemPrice?: number;
+}
+
 interface Order {
   id: string;
   tableNumber: number;
   customerName?: string;
   status: "pending" | "preparing" | "ready" | "completed" | "cancelled";
   total: number;
-  items: number;
+  items: OrderItem[] | number;
   createdAt: { toDate: () => Date } | string;
+}
+
+function itemCount(items: OrderItem[] | number): number {
+  if (Array.isArray(items)) return items.length;
+  if (typeof items === "number") return items;
+  return 0;
 }
 
 interface TableDoc {
@@ -154,7 +169,7 @@ export default function DashboardPage() {
                     <tr key={order.id} className="hover:bg-slate-800/30 transition-colors">
                       <td className="font-medium text-slate-200">T{order.tableNumber}</td>
                       <td>{order.customerName || "Guest"}</td>
-                      <td>{order.items} items</td>
+                      <td>{itemCount(order.items)} items</td>
                       <td className="text-emerald-400 font-semibold">₹{(order.total || 0).toLocaleString("en-IN")}</td>
                       <td>
                         <span className={statusBadge[order.status] || "badge badge-gray"}>
