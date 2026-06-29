@@ -1,88 +1,64 @@
-import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import LoginPage from "@/pages/LoginPage";
-import WaiterDashboard from "@/pages/WaiterDashboard";
-import KitchenDashboard from "@/pages/KitchenDashboard";
-import AccountantDashboard from "@/pages/AccountantDashboard";
-import OwnerDashboard from "@/pages/OwnerDashboard";
-import MenuManagement from "@/pages/MenuManagement";
-import InventoryManagement from "@/pages/InventoryManagement";
-import StaffManagement from "@/pages/StaffManagement";
-import TableManagement from "@/pages/TableManagement";
-import AttendanceDashboard from "@/pages/AttendanceDashboard";
-import ExpenseManagement from "@/pages/ExpenseManagement";
-import NotFound from "@/pages/not-found";
+import DashboardPage from "@/pages/DashboardPage";
+import TablesPage from "@/pages/TablesPage";
+import OrdersPage from "@/pages/OrdersPage";
+import KitchenPage from "@/pages/KitchenPage";
+import BillingPage from "@/pages/BillingPage";
+import CustomersPage from "@/pages/CustomersPage";
+import MenuPage from "@/pages/MenuPage";
+import InventoryPage from "@/pages/InventoryPage";
+import ReportsPage from "@/pages/ReportsPage";
+import SettingsPage from "@/pages/SettingsPage";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { retry: 1, staleTime: 30_000 },
-  },
-});
-
-function RoleRedirect() {
-  const { user, isLoading } = useAuth();
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-background"><div className="text-muted-foreground">Loading...</div></div>;
-  if (!user) return <Redirect to="/login" />;
-  return <Redirect to={`/${user.role}`} />;
+function ProtectedRoute({ children, permission }: { children: React.ReactNode; permission?: string }) {
+  const { currentUser, loading, hasPermission } = useAuth();
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+  if (!currentUser) return <Navigate to="/login" replace />;
+  if (permission && !hasPermission(permission)) return <Navigate to="/" replace />;
+  return <>{children}</>;
 }
 
-function AppRouter() {
+export default function App() {
+  const { currentUser, loading } = useAuth();
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+
   return (
-    <Switch>
-      <Route path="/login" component={LoginPage} />
-      <Route path="/waiter">
-        <ProtectedRoute allowedRoles={["waiter"]}><WaiterDashboard /></ProtectedRoute>
-      </Route>
-      <Route path="/kitchen">
-        <ProtectedRoute allowedRoles={["kitchen"]}><KitchenDashboard /></ProtectedRoute>
-      </Route>
-      <Route path="/accountant">
-        <ProtectedRoute allowedRoles={["accountant"]}><AccountantDashboard /></ProtectedRoute>
-      </Route>
-      <Route path="/owner">
-        <ProtectedRoute allowedRoles={["owner"]}><OwnerDashboard /></ProtectedRoute>
-      </Route>
-      <Route path="/owner/menu">
-        <ProtectedRoute allowedRoles={["owner"]}><MenuManagement /></ProtectedRoute>
-      </Route>
-      <Route path="/owner/inventory">
-        <ProtectedRoute allowedRoles={["owner"]}><InventoryManagement /></ProtectedRoute>
-      </Route>
-      <Route path="/owner/staff">
-        <ProtectedRoute allowedRoles={["owner"]}><StaffManagement /></ProtectedRoute>
-      </Route>
-      <Route path="/owner/tables">
-        <ProtectedRoute allowedRoles={["owner"]}><TableManagement /></ProtectedRoute>
-      </Route>
-      <Route path="/owner/attendance">
-        <ProtectedRoute allowedRoles={["owner"]}><AttendanceDashboard /></ProtectedRoute>
-      </Route>
-      <Route path="/owner/expenses">
-        <ProtectedRoute allowedRoles={["owner"]}><ExpenseManagement /></ProtectedRoute>
-      </Route>
-      <Route path="/" component={RoleRedirect} />
-      <Route component={NotFound} />
-    </Switch>
+    <Routes>
+      <Route path="/login" element={currentUser ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <Routes>
+                <Route path="/" element={<ProtectedRoute permission="dashboard"><DashboardPage /></ProtectedRoute>} />
+                <Route path="/tables" element={<ProtectedRoute permission="tables"><TablesPage /></ProtectedRoute>} />
+                <Route path="/orders" element={<ProtectedRoute permission="orders"><OrdersPage /></ProtectedRoute>} />
+                <Route path="/kitchen" element={<ProtectedRoute permission="kitchen"><KitchenPage /></ProtectedRoute>} />
+                <Route path="/billing" element={<ProtectedRoute permission="billing"><BillingPage /></ProtectedRoute>} />
+                <Route path="/customers" element={<ProtectedRoute permission="customers"><CustomersPage /></ProtectedRoute>} />
+                <Route path="/menu" element={<ProtectedRoute permission="menu"><MenuPage /></ProtectedRoute>} />
+                <Route path="/inventory" element={<ProtectedRoute permission="inventory"><InventoryPage /></ProtectedRoute>} />
+                <Route path="/reports" element={<ProtectedRoute permission="reports"><ReportsPage /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute permission="settings"><SettingsPage /></ProtectedRoute>} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <AuthProvider>
-            <AppRouter />
-          </AuthProvider>
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-}
-
-export default App;

@@ -1,70 +1,105 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useGetMe, getGetMeQueryKey, User } from "@workspace/api-client-react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import {
+  User,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { auth, db } from "@/lib/firebase";
 
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  login: (token: string, user: User) => void;
-  logout: () => void;
-  isLoading: boolean;
+export type UserRole = "owner" | "manager" | "waiter" | "cashier";
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  createdAt: string;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
+  owner: [
+    "dashboard","tables","orders","kitchen",
+    "billing","customers","menu","inventory","reports","settings",
+  ],
+  manager: ["dashboard", "tables", "orders", "kitchen", "reports"],
+  waiter: ["tables", "orders"],
+  cashier: ["billing"],
+};
+
+interface AuthContextType {
+  currentUser: User | null;
+  userProfile: UserProfile | null;
+  role: UserRole | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  hasPermission: (permission: string) => boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem("hms_token"));
-  const [user, setUser] = useState<User | null>(null);
-  const [, setLocation] = useLocation();
-  const queryClient = useQueryClient();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const { data: me, isLoading, error } = useGetMe({
-    query: {
-      queryKey: getGetMeQueryKey(),
-      enabled: !!token,
-      retry: false,
-    },
-  });
+  async function login(email: string, password: string) {
+    await signInWithEmailAndPassword(auth, email, password);
+  }
+
+  async function logout() {
+    await signOut(auth);
+    setUserProfile(null);
+  }
+
+  function hasPermission(permission: string): boolean {
+    if (!userProfile?.role) return false;
+    return ROLE_PERMISSIONS[userProfile.role]?.includes(permission) ?? false;
+  }
+
+  const role = userProfile?.role ?? null;
 
   useEffect(() => {
-    if (me) {
-      setUser(me);
-    }
-  }, [me]);
-
-  useEffect(() => {
-    if (error) {
-      logout();
-    }
-  }, [error]);
-
-  const login = (newToken: string, newUser: User) => {
-    queryClient.clear();
-    localStorage.setItem("hms_token", newToken);
-    setToken(newToken);
-    setUser(newUser);
-  };
-
-  const logout = () => {
-    queryClient.clear();
-    localStorage.removeItem("hms_token");
-    setToken(null);
-    setUser(null);
-    setLocation("/login");
-  };
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            setUserProfile(userDoc.data() as UserProfile);
+          } else {
+            const profile: UserProfile = {
+              uid: user.uid,
+              email: user.email!,
+              name: user.displayName || user.email!.split("@")[0],
+              role: "waiter",
+              createdAt: new Date().toISOString(),
+            };
+            await setDoc(doc(db, "users", user.uid), profile);
+            setUserProfile(profile);
+          }
+        } catch {
+          setUserProfile(null);
+        }
+      } else {
+        setUserProfile(null);
+      }
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ currentUser, userProfile, role, loading, login, logout, hasPermission }}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 }

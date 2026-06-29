@@ -1,143 +1,108 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-card-border: hsl(var(--card-border));
-
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-popover-border: hsl(var(--popover-border));
-
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-primary-border: var(--primary-border);
-
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-secondary-border: var(--secondary-border);
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-muted-border: var(--muted-border);
-
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-accent-border: var(--accent-border);
-
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-destructive-border: var(--destructive-border);
-
-  --font-sans: var(--app-font-sans);
-  --font-serif: var(--app-font-serif);
-  --font-mono: var(--app-font-mono);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-}
-
 :root {
-  --background: 30 20% 97%;
-  --foreground: 346 25% 10%;
-  --border: 346 10% 88%;
-  --input: 346 10% 88%;
-  --ring: 346 45% 35%;
-
-  --card: 0 0% 100%;
-  --card-foreground: 346 25% 10%;
-  --card-border: 346 10% 92%;
-
-  --popover: 0 0% 100%;
-  --popover-foreground: 346 25% 10%;
-  --popover-border: 346 10% 90%;
-
-  --primary: 346 45% 34%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 346 20% 94%;
-  --secondary-foreground: 346 45% 34%;
-
-  --muted: 346 10% 94%;
-  --muted-foreground: 346 10% 45%;
-
-  --accent: 38 45% 91%;
-  --accent-foreground: 38 65% 28%;
-
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
-
-  --radius: 0.625rem;
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: Georgia, serif;
-  --app-font-mono: Menlo, monospace;
+  --sidebar-width: 256px;
+  --navbar-height: 64px;
 }
 
-.dark {
-  --background: 346 20% 6%;
-  --foreground: 0 0% 97%;
-  --border: 346 20% 16%;
-  --input: 346 20% 16%;
-  --ring: 346 45% 45%;
-
-  --card: 346 20% 9%;
-  --card-foreground: 0 0% 97%;
-  --card-border: 346 20% 14%;
-
-  --popover: 346 20% 9%;
-  --popover-foreground: 0 0% 97%;
-  --popover-border: 346 20% 14%;
-
-  --primary: 346 45% 48%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 346 20% 16%;
-  --secondary-foreground: 0 0% 97%;
-
-  --muted: 346 20% 16%;
-  --muted-foreground: 346 10% 62%;
-
-  --accent: 38 40% 22%;
-  --accent-foreground: 38 60% 82%;
-
-  --destructive: 0 62% 42%;
-  --destructive-foreground: 0 0% 100%;
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply font-sans antialiased bg-background text-foreground;
-  }
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #0f172a;
+  color: #f8fafc;
+  -webkit-font-smoothing: antialiased;
 }
 
-@layer utilities {
-  .scrollbar-none {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
-  }
-  .card-shadow {
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
-  }
-  .card-shadow-md {
-    box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
-  }
+@font-face {
+  font-family: 'Inter';
+  src: local('Inter');
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 text-sm font-medium transition-all duration-200 cursor-pointer select-none;
+}
+
+.sidebar-link:hover {
+  @apply bg-slate-800 text-slate-200;
+}
+
+.sidebar-link.active {
+  @apply bg-emerald-500/10 text-emerald-400 font-semibold;
+}
+
+.stat-card {
+  @apply bg-slate-800 border border-slate-700/50 rounded-xl p-5;
+}
+
+.page-container {
+  @apply p-4 md:p-6 space-y-6;
+}
+
+.section-title {
+  @apply text-lg font-semibold text-slate-100;
+}
+
+.data-table th {
+  @apply text-xs font-semibold text-slate-400 uppercase tracking-wide bg-slate-800/50 px-4 py-3;
+}
+
+.data-table td {
+  @apply px-4 py-3 text-sm text-slate-300 border-b border-slate-700/50;
+}
+
+.data-table tr:last-child td {
+  @apply border-b-0;
+}
+
+.badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;
+}
+
+.badge-green { @apply bg-emerald-500/15 text-emerald-400; }
+.badge-yellow { @apply bg-amber-500/15 text-amber-400; }
+.badge-red { @apply bg-red-500/15 text-red-400; }
+.badge-blue { @apply bg-blue-500/15 text-blue-400; }
+.badge-purple { @apply bg-purple-500/15 text-purple-400; }
+.badge-gray { @apply bg-slate-600/50 text-slate-300; }
+
+.btn-primary {
+  @apply inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold text-sm rounded-lg transition-colors duration-200 cursor-pointer;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium text-sm rounded-lg transition-colors duration-200 cursor-pointer;
+}
+
+.input-dark {
+  @apply w-full bg-slate-700/50 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-colors;
+}
+
+.card-dark {
+  @apply bg-slate-800 border border-slate-700/50 rounded-xl;
 }
