@@ -63,7 +63,6 @@ const statusConfig = {
 const STATUS_FLOW: Record<string, string> = {
   pending: "preparing",
   preparing: "ready",
-  ready: "completed",
 };
 
 export default function OrdersPage() {
@@ -77,6 +76,7 @@ export default function OrdersPage() {
   const [showModal, setShowModal] = useState(false);
   const [newOrder, setNewOrder] = useState({ tableNumber: "", customerName: "", notes: "" });
   const [cart, setCart] = useState<OrderItem[]>([]);
+  const [menuSearch, setMenuSearch] = useState("");
 
   useEffect(() => {
     const u1 = onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")),
@@ -95,6 +95,8 @@ export default function OrdersPage() {
     const matchSearch = !search || `T${o.tableNumber} ${o.customerName}`.toLowerCase().includes(search.toLowerCase());
     return matchFilter && matchSearch;
   });
+
+  const filteredMenuItems = menuItems.filter(i => !menuSearch || i.name.toLowerCase().includes(menuSearch.toLowerCase()) || i.category.toLowerCase().includes(menuSearch.toLowerCase()));
 
   function addToCart(item: MenuItem) {
     setCart(c => {
@@ -118,8 +120,8 @@ export default function OrdersPage() {
         status: "pending",
         items: cart,
         total: cartTotal(),
-        notes: newOrder.notes,
-        createdBy: userProfile?.uid,
+        notes: newOrder.notes || "",
+        createdBy: userProfile?.uid || "unknown",
         createdAt: serverTimestamp(),
       });
       const tableDoc = tables.find(t => t.number === Number(newOrder.tableNumber));
@@ -128,8 +130,9 @@ export default function OrdersPage() {
       setShowModal(false);
       setCart([]);
       setNewOrder({ tableNumber: "", customerName: "", notes: "" });
-    } catch {
-      toast.error("Failed to create order");
+    } catch (e: any) {
+      toast.error("Failed to create order: " + (e.message || "Unknown error"));
+      console.error(e);
     }
   }
 
@@ -148,10 +151,10 @@ export default function OrdersPage() {
     <div className="page-container">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-100">Orders</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Orders</h1>
           <p className="text-sm text-slate-500 mt-0.5">{orders.length} total · {orders.filter(o => o.status === "pending").length} pending</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn-primary">
+        <button onClick={() => { setShowModal(true); setMenuSearch(""); }} className="btn-primary">
           <Plus size={16} /> New Order
         </button>
       </div>
@@ -166,7 +169,7 @@ export default function OrdersPage() {
         <div className="flex gap-1.5 flex-wrap">
           {["all","pending","preparing","ready","completed"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors capitalize ${filter === f ? "bg-emerald-500 text-slate-900" : "bg-slate-800 text-slate-400 hover:text-slate-200"}`}>
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors capitalize ${filter === f ? "bg-emerald-500 text-slate-900" : "bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-200"}`}>
               {f}
             </button>
           ))}
@@ -176,7 +179,7 @@ export default function OrdersPage() {
       {/* Order cards */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => <div key={i} className="h-40 bg-slate-800 rounded-xl animate-pulse" />)}
+          {[...Array(6)].map((_, i) => <div key={i} className="h-40 bg-white dark:bg-slate-800 rounded-xl animate-pulse" />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-slate-500">
@@ -192,12 +195,12 @@ export default function OrdersPage() {
                 className="card-dark p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-slate-100">Table {order.tableNumber}</span>
+                    <span className="text-lg font-bold text-slate-900 dark:text-slate-100">Table {order.tableNumber}</span>
                     <span className={cfg.cls}>{cfg.label}</span>
                   </div>
                   <span className="text-lg font-bold text-emerald-400">₹{(order.total || 0).toLocaleString("en-IN")}</span>
                 </div>
-                <div className="text-sm text-slate-400">{order.customerName} · {Array.isArray(order.items) ? order.items.length : 0} items</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">{order.customerName} · {Array.isArray(order.items) ? order.items.length : 0} items</div>
                 {Array.isArray(order.items) && (
                   <div className="text-xs text-slate-500 space-y-0.5">
                     {order.items.slice(0, 3).map((raw, idx) => {
@@ -224,10 +227,10 @@ export default function OrdersPage() {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             className="card-dark w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
-            <h3 className="text-base font-bold text-slate-100 mb-5">Create New Order</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-5">Create New Order</h3>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Table Number</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Table Number</label>
                 <select value={newOrder.tableNumber} onChange={e => setNewOrder(o => ({ ...o, tableNumber: e.target.value }))}
                   className="input-dark">
                   <option value="">Select table</option>
@@ -235,20 +238,26 @@ export default function OrdersPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Customer Name</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Customer Name</label>
                 <input value={newOrder.customerName} onChange={e => setNewOrder(o => ({ ...o, customerName: e.target.value }))}
                   className="input-dark" placeholder="Guest" />
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="block text-xs text-slate-400 mb-2">Menu Items</label>
+              <div className="flex items-center justify-between mb-2 gap-2">
+                <label className="block text-xs text-slate-500 dark:text-slate-400 shrink-0">Menu Items</label>
+                <div className="relative flex-1 max-w-[200px]">
+                  <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <input value={menuSearch} onChange={e => setMenuSearch(e.target.value)} placeholder="Search item..." className="input-dark pl-7 py-1.5 text-xs bg-white dark:bg-slate-800" />
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
-                {menuItems.map(item => (
+                {filteredMenuItems.map(item => (
                   <button key={item.id} onClick={() => addToCart(item)}
-                    className="flex items-center justify-between bg-slate-700/50 hover:bg-slate-700 rounded-lg p-3 text-left transition-colors">
+                    className="flex items-center justify-between bg-slate-200/50 dark:bg-slate-700/50 hover:bg-slate-100 dark:bg-slate-700 rounded-lg p-3 text-left transition-colors">
                     <div>
-                      <div className="text-sm font-medium text-slate-200">{item.name}</div>
+                      <div className="text-sm font-medium text-slate-900 dark:text-slate-200">{item.name}</div>
                       <div className="text-xs text-slate-500">{item.category}</div>
                     </div>
                     <div className="text-sm font-bold text-emerald-400">₹{item.price}</div>
@@ -259,11 +268,11 @@ export default function OrdersPage() {
             </div>
 
             {cart.length > 0 && (
-              <div className="mb-4 bg-slate-700/30 rounded-lg p-3">
-                <div className="text-xs font-semibold text-slate-400 mb-2">Order Summary</div>
+              <div className="mb-4 bg-slate-100 dark:bg-slate-700/30 rounded-lg p-3">
+                <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Order Summary</div>
                 {cart.map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between py-1 text-sm">
-                    <span className="text-slate-300">{item.qty}× {item.name}</span>
+                    <span className="text-slate-700 dark:text-slate-300">{item.qty}× {item.name}</span>
                     <div className="flex items-center gap-3">
                       <span className="text-emerald-400">₹{(item.qty * item.price).toLocaleString("en-IN")}</span>
                       <button onClick={() => setCart(c => c.filter((_, i) => i !== idx))} className="text-slate-500 hover:text-red-400">×</button>
@@ -271,14 +280,14 @@ export default function OrdersPage() {
                   </div>
                 ))}
                 <div className="border-t border-slate-600 mt-2 pt-2 flex justify-between font-bold">
-                  <span className="text-slate-300">Total</span>
+                  <span className="text-slate-700 dark:text-slate-300">Total</span>
                   <span className="text-emerald-400">₹{cartTotal().toLocaleString("en-IN")}</span>
                 </div>
               </div>
             )}
 
             <div className="mb-4">
-              <label className="block text-xs text-slate-400 mb-1.5">Notes</label>
+              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Notes</label>
               <input value={newOrder.notes} onChange={e => setNewOrder(o => ({ ...o, notes: e.target.value }))}
                 className="input-dark" placeholder="Special instructions..." />
             </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Settings, UserPlus, Shield, Trash2, Users } from "lucide-react";
+import { UserPlus, Shield, Trash2, Users } from "lucide-react";
 import {
   collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, query, orderBy,
 } from "firebase/firestore";
@@ -89,7 +89,7 @@ export default function SettingsPage() {
     <div className="page-container">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-100">Settings</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Settings</h1>
           <p className="text-sm text-slate-500 mt-0.5">Manage staff and permissions</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary">
@@ -97,29 +97,10 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {/* Hotel Info */}
-      <div className="card-dark rounded-xl p-5">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-            <Settings size={18} className="text-emerald-400" />
-          </div>
-          <h2 className="section-title">Hotel Information</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Hotel Name</label>
-            <input defaultValue="Shagun Tadka" className="input-dark" readOnly />
-          </div>
-          <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Firebase Project</label>
-            <input defaultValue={import.meta.env.VITE_FIREBASE_PROJECT_ID || "hotel-hub-hms"} className="input-dark" readOnly />
-          </div>
-        </div>
-      </div>
 
       {/* Staff Management */}
       <div className="card-dark rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-700/50 flex items-center gap-3">
+        <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700/50 flex items-center gap-3">
           <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
             <Users size={16} className="text-blue-400" />
           </div>
@@ -127,7 +108,7 @@ export default function SettingsPage() {
         </div>
 
         {loading ? (
-          <div className="p-5 space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-14 bg-slate-700/50 rounded animate-pulse" />)}</div>
+          <div className="p-5 space-y-3">{[...Array(4)].map((_, i) => <div key={i} className="h-14 bg-slate-200/50 dark:bg-slate-700/50 rounded animate-pulse" />)}</div>
         ) : staff.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-slate-500">
             <Shield size={32} className="mb-3 opacity-40" />
@@ -139,12 +120,12 @@ export default function SettingsPage() {
               const roleConfig = ROLES.find(r => r.value === s.role);
               return (
                 <motion.div key={s.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.04 }}
-                  className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-800/30 transition-colors">
-                  <div className="w-9 h-9 bg-slate-700 rounded-full flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-slate-300">{s.name?.charAt(0).toUpperCase()}</span>
+                  className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 dark:bg-slate-800/30 transition-colors">
+                  <div className="w-9 h-9 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center shrink-0">
+                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{s.name?.charAt(0).toUpperCase()}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-slate-200 truncate flex items-center gap-2">
+                    <div className="text-sm font-semibold text-slate-900 dark:text-slate-200 truncate flex items-center gap-2">
                       {s.name}
                       {s.id === userProfile?.uid && <span className="text-xs text-emerald-400 font-normal">(you)</span>}
                     </div>
@@ -153,7 +134,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-3">
                     <select value={s.role} onChange={e => handleRoleChange(s.id, e.target.value as UserRole)}
                       disabled={s.id === userProfile?.uid}
-                      className="text-xs bg-slate-700/50 border border-slate-600 rounded-lg px-2 py-1 text-slate-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                      className="text-xs bg-slate-200/50 dark:bg-slate-700/50 border border-slate-600 rounded-lg px-2 py-1 text-slate-700 dark:text-slate-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                       {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                     </select>
                     <button onClick={() => handleDelete(s)}
@@ -174,22 +155,22 @@ export default function SettingsPage() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             className="card-dark w-full max-w-sm p-6 rounded-xl">
-            <h3 className="font-bold text-slate-100 mb-5">Add Staff Member</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-5">Add Staff Member</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Full Name *</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Full Name *</label>
                 <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="input-dark" placeholder="Staff name" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Email *</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Email *</label>
                 <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="input-dark" placeholder="email@example.com" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Password *</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Password *</label>
                 <input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} className="input-dark" placeholder="Min 6 characters" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Role *</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Role *</label>
                 <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value as UserRole }))} className="input-dark">
                   {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                 </select>

@@ -106,7 +106,7 @@ export default function DashboardPage() {
     <div className="page-container">
       {/* Welcome */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-xl font-bold text-slate-100">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">
           Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, {userProfile?.name?.split(" ")[0]} 👋
         </h1>
         <p className="text-slate-500 text-sm mt-0.5">
@@ -125,7 +125,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className={`text-2xl font-bold ${s.color}`}>
-              {loading ? <div className="h-7 w-16 bg-slate-700 rounded animate-pulse" /> : s.value}
+              {loading ? <div className="h-7 w-16 bg-slate-100 dark:bg-slate-700 rounded animate-pulse" /> : s.value}
             </div>
           </motion.div>
         ))}
@@ -137,14 +137,14 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="xl:col-span-2 card-dark overflow-hidden"
         >
-          <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between">
+          <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
             <h2 className="section-title">Recent Orders</h2>
             <TrendingUp size={16} className="text-slate-500" />
           </div>
           {loading ? (
             <div className="p-5 space-y-3">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-10 bg-slate-700/50 rounded animate-pulse" />
+                <div key={i} className="h-10 bg-slate-200/50 dark:bg-slate-700/50 rounded animate-pulse" />
               ))}
             </div>
           ) : recentOrders.length === 0 ? (
@@ -166,8 +166,8 @@ export default function DashboardPage() {
                 </thead>
                 <tbody>
                   {recentOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-slate-800/30 transition-colors">
-                      <td className="font-medium text-slate-200">T{order.tableNumber}</td>
+                    <tr key={order.id} className="hover:bg-slate-50 dark:bg-slate-800/30 transition-colors">
+                      <td className="font-medium text-slate-900 dark:text-slate-200">T{order.tableNumber}</td>
                       <td>{order.customerName || "Guest"}</td>
                       <td>{itemCount(order.items)} items</td>
                       <td className="text-emerald-400 font-semibold">₹{(order.total || 0).toLocaleString("en-IN")}</td>
@@ -189,14 +189,14 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
           className="card-dark overflow-hidden"
         >
-          <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between">
+          <div className="px-5 py-4 border-b border-slate-200 dark:border-slate-700/50 flex items-center justify-between">
             <h2 className="section-title">Table Status</h2>
             <Users size={16} className="text-slate-500" />
           </div>
           {loading ? (
             <div className="p-4 grid grid-cols-4 gap-2">
               {[...Array(12)].map((_, i) => (
-                <div key={i} className="h-12 bg-slate-700/50 rounded-lg animate-pulse" />
+                <div key={i} className="h-12 bg-slate-200/50 dark:bg-slate-700/50 rounded-lg animate-pulse" />
               ))}
             </div>
           ) : tables.length === 0 ? (

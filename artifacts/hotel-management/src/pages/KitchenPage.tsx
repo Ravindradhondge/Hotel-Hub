@@ -38,13 +38,11 @@ const COLUMNS = [
 const NEXT: Record<string, string> = {
   pending: "preparing",
   preparing: "ready",
-  ready: "completed",
 };
 
 const NEXT_LABEL: Record<string, string> = {
   pending: "Start Cooking",
   preparing: "Mark Ready",
-  ready: "Complete",
 };
 
 function timeAgo(createdAt: Order["createdAt"]) {
@@ -99,7 +97,7 @@ export default function KitchenPage() {
           <ChefHat size={20} className="text-orange-400" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-slate-100">Kitchen Display</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Kitchen Display</h1>
           <p className="text-sm text-slate-500">{orders.filter(o => o.status !== "ready").length} active orders</p>
         </div>
         <div className="ml-auto flex items-center gap-1.5">
@@ -113,7 +111,7 @@ export default function KitchenPage() {
           const colOrders = orders.filter(o => o.status === col.key);
           return (
             <div key={col.key} className={`card-dark border ${col.border} ${col.bg} rounded-xl overflow-hidden flex flex-col`}>
-              <div className={`px-4 py-3 border-b border-slate-700/50 flex items-center justify-between`}>
+              <div className={`px-4 py-3 border-b border-slate-200 dark:border-slate-700/50 flex items-center justify-between`}>
                 <div className="flex items-center gap-2">
                   <col.icon size={16} className={col.color} />
                   <span className={`font-bold text-sm ${col.color}`}>{col.label}</span>
@@ -125,7 +123,7 @@ export default function KitchenPage() {
 
               <div className="flex-1 p-3 space-y-3 overflow-y-auto">
                 {loading ? (
-                  [...Array(2)].map((_, i) => <div key={i} className="h-28 bg-slate-700/30 rounded-lg animate-pulse" />)
+                  [...Array(2)].map((_, i) => <div key={i} className="h-28 bg-slate-100 dark:bg-slate-700/30 rounded-lg animate-pulse" />)
                 ) : colOrders.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-32 text-slate-600">
                     <col.icon size={28} className="mb-2 opacity-40" />
@@ -134,21 +132,21 @@ export default function KitchenPage() {
                 ) : (
                   colOrders.map(order => (
                     <motion.div key={order.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                      className="bg-slate-800 border border-slate-700/50 rounded-xl p-3">
+                      className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/50 rounded-xl p-3">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-slate-100">Table {order.tableNumber}</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-100">Table {order.tableNumber}</span>
                         <span className="text-xs text-slate-500">{timeAgo(order.createdAt)}</span>
                       </div>
-                      <div className="text-xs text-slate-400 mb-3 font-medium">{order.customerName}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mb-3 font-medium">{order.customerName}</div>
                       <div className="space-y-1 mb-3">
                         {Array.isArray(order.items) && order.items.map((raw, i) => {
                           const item = normItem(raw);
                           return (
                             <div key={i} className="flex items-center gap-2 text-sm">
-                              <span className="w-5 h-5 bg-slate-700 rounded text-center text-xs font-bold text-slate-300 flex items-center justify-center">
+                              <span className="w-5 h-5 bg-slate-100 dark:bg-slate-700 rounded text-center text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center">
                                 {item.qty}
                               </span>
-                              <span className="text-slate-200">{item.name}</span>
+                              <span className="text-slate-900 dark:text-slate-200">{item.name}</span>
                             </div>
                           );
                         })}
@@ -163,7 +161,7 @@ export default function KitchenPage() {
                           className={`w-full py-1.5 rounded-lg text-xs font-bold transition-colors ${
                             order.status === "pending" ? "bg-blue-500 hover:bg-blue-400 text-white" :
                             order.status === "preparing" ? "bg-emerald-500 hover:bg-emerald-400 text-slate-900" :
-                            "bg-slate-600 hover:bg-slate-500 text-slate-200"
+                            "bg-slate-600 hover:bg-slate-500 text-slate-900 dark:text-slate-200"
                           }`}>
                           {NEXT_LABEL[order.status]}
                         </button>

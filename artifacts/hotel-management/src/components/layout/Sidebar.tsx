@@ -57,27 +57,27 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-slate-950 border-r border-slate-800">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800">
       {/* Logo */}
-      <div className="flex items-center justify-between px-4 py-5 border-b border-slate-800">
+      <div className="flex items-center justify-between px-4 py-5 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-emerald-500 rounded-lg flex items-center justify-center">
-            <ChefHat size={20} className="text-slate-900" />
+            <ChefHat size={20} className="text-white dark:text-slate-900" />
           </div>
           <div>
-            <div className="text-sm font-bold text-slate-100">Shagun Tadka</div>
+            <div className="text-sm font-bold text-slate-900 dark:text-slate-100">Hotel Sai Mahlar</div>
             <div className="text-xs text-slate-500">Management System</div>
           </div>
         </div>
-        <button onClick={onClose} className="md:hidden text-slate-500 hover:text-slate-300 p-1">
+        <button onClick={onClose} className="md:hidden text-slate-500 hover:text-slate-700 dark:hover:text-slate-700 dark:text-slate-300 p-1">
           <X size={18} />
         </button>
       </div>
 
       {/* User Info */}
-      <div className="px-4 py-3 mx-3 mt-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
-        <div className="text-xs text-slate-400 mb-0.5">Logged in as</div>
-        <div className="text-sm font-semibold text-slate-200 truncate">{userProfile?.name}</div>
+      <div className="px-4 py-3 mx-3 mt-3 rounded-lg bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
+        <div className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">Logged in as</div>
+        <div className="text-sm font-semibold text-slate-900 dark:text-slate-200 truncate">{userProfile?.name}</div>
         <span className={`mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${roleColors[userProfile?.role ?? "waiter"]}`}>
           {userProfile?.role?.charAt(0).toUpperCase()}{userProfile?.role?.slice(1)}
         </span>
@@ -102,10 +102,10 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       </nav>
 
       {/* Logout */}
-      <div className="px-3 py-4 border-t border-slate-800">
+      <div className="px-3 py-4 border-t border-slate-200 dark:border-slate-800">
         <button
           onClick={handleLogout}
-          className="sidebar-link w-full text-red-400 hover:bg-red-500/10 hover:text-red-400"
+          className="sidebar-link w-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-400"
         >
           <LogOut size={18} />
           <span>Logout</span>

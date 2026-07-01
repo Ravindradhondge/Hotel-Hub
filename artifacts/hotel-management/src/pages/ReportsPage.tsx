@@ -95,8 +95,8 @@ export default function ReportsPage() {
 
   const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
     if (active && payload?.length) return (
-      <div className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs">
-        <div className="text-slate-400">{label}</div>
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-xs">
+        <div className="text-slate-500 dark:text-slate-400">{label}</div>
         <div className="text-emerald-400 font-bold">₹{payload[0].value.toLocaleString("en-IN")}</div>
       </div>
     );
@@ -106,7 +106,7 @@ export default function ReportsPage() {
   return (
     <div className="page-container">
       <div>
-        <h1 className="text-xl font-bold text-slate-100">Reports & Analytics</h1>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Reports & Analytics</h1>
         <p className="text-sm text-slate-500 mt-0.5">Real-time business insights</p>
       </div>
 
@@ -118,7 +118,7 @@ export default function ReportsPage() {
               <span className="text-xs text-slate-500">{s.label}</span>
             </div>
             <div className={`text-2xl font-bold ${s.color}`}>
-              {loading ? <div className="h-7 w-20 bg-slate-700 animate-pulse rounded" /> : s.value}
+              {loading ? <div className="h-7 w-20 bg-slate-100 dark:bg-slate-700 animate-pulse rounded" /> : s.value}
             </div>
           </motion.div>
         ))}
@@ -163,10 +163,10 @@ export default function ReportsPage() {
               {topItems.map((item, i) => (
                 <div key={item.name}>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-300">{item.name}</span>
+                    <span className="text-slate-700 dark:text-slate-300">{item.name}</span>
                     <span className="text-slate-500 font-medium">{item.count} sold</span>
                   </div>
-                  <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                     <motion.div initial={{ width: 0 }} animate={{ width: `${(item.count / topItems[0].count) * 100}%` }}
                       transition={{ delay: 0.5 + i * 0.05, duration: 0.5 }}
                       className="h-full rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
@@ -195,8 +195,8 @@ export default function ReportsPage() {
                 {methodData.map((m, i) => (
                   <div key={m.name} className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i] }} />
-                    <span className="text-sm text-slate-300 flex-1">{m.name}</span>
-                    <span className="text-sm font-semibold text-slate-200">{m.value}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 flex-1">{m.name}</span>
+                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-200">{m.value}</span>
                   </div>
                 ))}
               </div>

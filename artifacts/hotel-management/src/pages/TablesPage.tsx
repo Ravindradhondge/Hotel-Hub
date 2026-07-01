@@ -97,7 +97,7 @@ export default function TablesPage() {
     <div className="page-container">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-100">Table Management</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Table Management</h1>
           <p className="text-sm text-slate-500 mt-0.5">{tables.length} tables · {tables.filter(t => t.status === "available").length} available</p>
         </div>
         <button onClick={openAdd} className="btn-primary">
@@ -122,7 +122,7 @@ export default function TablesPage() {
       {/* Grid */}
       {loading ? (
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-          {[...Array(12)].map((_, i) => <div key={i} className="h-32 bg-slate-800 rounded-xl animate-pulse" />)}
+          {[...Array(12)].map((_, i) => <div key={i} className="h-32 bg-white dark:bg-slate-800 rounded-xl animate-pulse" />)}
         </div>
       ) : tables.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-slate-500">
@@ -142,7 +142,7 @@ export default function TablesPage() {
               <div className="flex items-center justify-between">
                 <span className="font-bold text-lg">T{t.number}</span>
                 <div className="flex gap-1">
-                  <button onClick={() => openEdit(t)} className="text-slate-500 hover:text-slate-200 p-0.5">
+                  <button onClick={() => openEdit(t)} className="text-slate-500 hover:text-slate-900 dark:text-slate-200 p-0.5">
                     <Edit2 size={12} />
                   </button>
                   <button onClick={() => handleDelete(t)} className="text-slate-500 hover:text-red-400 p-0.5">
@@ -154,7 +154,7 @@ export default function TablesPage() {
               <select
                 value={t.status}
                 onChange={(e) => changeStatus(t, e.target.value as TableDoc["status"])}
-                className="text-xs bg-slate-900/50 border border-slate-700 rounded px-1 py-0.5 text-slate-300 cursor-pointer"
+                className="text-xs bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded px-1 py-0.5 text-slate-700 dark:text-slate-300 cursor-pointer"
               >
                 <option value="available">Available</option>
                 <option value="occupied">Occupied</option>
@@ -173,20 +173,20 @@ export default function TablesPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="card-dark w-full max-w-sm p-6"
           >
-            <h3 className="text-base font-bold text-slate-100 mb-5">{editing ? "Edit Table" : "Add Table"}</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-5">{editing ? "Edit Table" : "Add Table"}</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Table Number</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Table Number</label>
                 <input type="number" value={form.number} onChange={e => setForm(f => ({ ...f, number: e.target.value }))}
                   className="input-dark" placeholder="e.g. 1" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Capacity (seats)</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Capacity (seats)</label>
                 <input type="number" value={form.capacity} onChange={e => setForm(f => ({ ...f, capacity: e.target.value }))}
                   className="input-dark" placeholder="e.g. 4" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Floor / Section</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Floor / Section</label>
                 <input type="text" value={form.floor} onChange={e => setForm(f => ({ ...f, floor: e.target.value }))}
                   className="input-dark" placeholder="e.g. Ground Floor" />
               </div>

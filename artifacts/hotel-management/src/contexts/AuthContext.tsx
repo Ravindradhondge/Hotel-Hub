@@ -30,10 +30,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
 
 // Demo account fallback — used when Firestore rules are not yet configured
 const DEMO_ROLES: Record<string, { role: UserRole; name: string }> = {
-  "owner@hotel.com":   { role: "owner",   name: "Hotel Owner" },
-  "manager@hotel.com": { role: "manager", name: "Raj Manager" },
-  "waiter@hotel.com":  { role: "waiter",  name: "Amit Waiter" },
-  "cashier@hotel.com": { role: "cashier", name: "Priya Cashier" },
+  "ravidhondge352@gmail.com": { role: "owner", name: "Ravi" },
 };
 
 interface AuthContextType {
@@ -94,11 +91,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists()) {
-            setUserProfile(userDoc.data() as UserProfile);
+            const data = userDoc.data() as UserProfile;
+            
+            // Force owner role and name for the user's email if it's missing or wrong
+            if (user.email === "ravidhondge352@gmail.com") {
+              let updated = false;
+              if (data.role !== "owner") {
+                data.role = "owner";
+                updated = true;
+              }
+              if (data.name !== "Ravi") {
+                data.name = "Ravi";
+                updated = true;
+              }
+              if (updated) {
+                // Try to update it in Firestore
+                setDoc(doc(db, "users", user.uid), { role: "owner", name: "Ravi" }, { merge: true }).catch(() => {});
+              }
+            }
+            
+            setUserProfile(data);
             setFirestoreReady(true);
           } else {
             // Doc doesn't exist — try to create it
             const profile = buildFallbackProfile(user);
+            
+            // Force owner role for the user's email
+            if (user.email === "ravidhondge352@gmail.com") {
+              profile.role = "owner";
+            }
+            
             try {
               await setDoc(doc(db, "users", user.uid), profile);
               setFirestoreReady(true);
@@ -111,7 +133,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch {
           // Firestore read blocked — use email-based fallback so app still works
           setFirestoreReady(false);
-          setUserProfile(buildFallbackProfile(user));
+          const profile = buildFallbackProfile(user);
+          if (user.email === "ravidhondge352@gmail.com") profile.role = "owner";
+          setUserProfile(profile);
         }
       } else {
         setUserProfile(null);

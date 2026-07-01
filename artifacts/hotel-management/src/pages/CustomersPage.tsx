@@ -58,7 +58,7 @@ export default function CustomersPage() {
     <div className="page-container">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-100">Customers</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Customers</h1>
           <p className="text-sm text-slate-500 mt-0.5">{customers.length} registered customers</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary">
@@ -74,7 +74,7 @@ export default function CustomersPage() {
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => <div key={i} className="h-28 bg-slate-800 rounded-xl animate-pulse" />)}
+          {[...Array(6)].map((_, i) => <div key={i} className="h-28 bg-white dark:bg-slate-800 rounded-xl animate-pulse" />)}
         </div>
       ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-slate-500">
@@ -91,7 +91,7 @@ export default function CustomersPage() {
                   <span className="text-emerald-400 font-bold text-sm">{c.name.charAt(0).toUpperCase()}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-slate-100 truncate">{c.name}</div>
+                  <div className="font-semibold text-slate-900 dark:text-slate-100 truncate">{c.name}</div>
                   <div className="flex items-center gap-1 text-xs text-slate-500 mt-0.5">
                     <Phone size={11} />
                     <span>{c.mobile}</span>
@@ -99,7 +99,7 @@ export default function CustomersPage() {
                   {c.email && <div className="text-xs text-slate-600 mt-0.5 truncate">{c.email}</div>}
                 </div>
               </div>
-              <div className="mt-3 pt-3 border-t border-slate-700/50 grid grid-cols-2 gap-2">
+              <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700/50 grid grid-cols-2 gap-2">
                 <div className="text-center">
                   <div className="text-lg font-bold text-blue-400">{c.visits}</div>
                   <div className="text-xs text-slate-500">Visits</div>
@@ -118,18 +118,18 @@ export default function CustomersPage() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             className="card-dark w-full max-w-sm p-6 rounded-xl">
-            <h3 className="font-bold text-slate-100 mb-5">Add Customer</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-5">Add Customer</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Full Name *</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Full Name *</label>
                 <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="input-dark" placeholder="Customer name" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Mobile Number *</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Mobile Number *</label>
                 <input value={form.mobile} onChange={e => setForm(f => ({ ...f, mobile: e.target.value }))} className="input-dark" placeholder="+91 00000 00000" />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Email (optional)</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1.5">Email (optional)</label>
                 <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="input-dark" placeholder="email@example.com" />
               </div>
             </div>

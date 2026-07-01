@@ -16,7 +16,7 @@ import SettingsPage from "@/pages/SettingsPage";
 function ProtectedRoute({ children, permission }: { children: React.ReactNode; permission?: string }) {
   const { currentUser, loading, hasPermission } = useAuth();
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
       <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
     </div>
   );
@@ -29,7 +29,7 @@ export default function App() {
   const { currentUser, loading } = useAuth();
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
       <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
     </div>
   );
